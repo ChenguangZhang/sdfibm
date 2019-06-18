@@ -1,0 +1,12 @@
+.
+libmaterial
+libmotion
+libshape
+libcollision
+
+/opt/openfoam6/src/finiteVolume/lnInclude/
+/opt/openfoam6/src/OpenFOAM/lnInclude/
+/opt/openfoam6/src/triSurface/lnInclude/
+/opt/openfoam6/src/meshTools/lnInclude/
+/opt/openfoam6/src/dynamicFvMesh/lnInclude/
+/opt/openfoam6/src/OSspecific/lnInclude/
