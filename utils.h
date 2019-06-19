@@ -37,4 +37,14 @@ inline void Quit(const std::string& msg)
     std::exit(1);
 }
 
+std::string GetTimeString(void)
+{
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+    std::stringstream ss;
+    ss << std::put_time(&tm, "%h %d %Y %H:%M:%S");
+    return ss.str();
+}
+
+
 #endif

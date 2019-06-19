@@ -51,6 +51,8 @@ SolidCloud::SolidCloud()
         string dim = m_ON_TWOD ? "2D" : "3D";
         string type = m_ON_FLUID? "FSI": "DEM (fluid disabled)";
         logfile << dim << ' ' << type << " simulation with g = " << "("<<m_gravity[0]<<' '<< m_gravity[1]<<' '<< m_gravity[2]<<")\n";
+        logfile << "Binary was compiled at " << __DATE__ << ' ' << __TIME__ << '\n';
+        logfile << "Simulation starts   at " << GetTimeString() << '\n';
     }
     if (m_ON_TWOD)
         m_vofCalculator = cellFraction2D;
@@ -150,6 +152,14 @@ SolidCloud::SolidCloud()
 
         // read pos
         vector pos = solid.lookup("pos");
+        if (m_ON_TWOD)
+        {
+            // sanity check for 2d simulation: the solid must have z = 0
+            if(pos.z() !=  0)
+            {
+                Quit("Solid must has z=0 in 2D simulation, violated by solid number " + std::to_string(i));
+            }
+        }
         // create solid
         Solid s(i, pos, quaternion::I);
         // read velocity, euler angle, angular velocity
@@ -182,7 +192,7 @@ SolidCloud::SolidCloud()
 
 SolidCloud::~SolidCloud()
 {
-    //delete ptr_uniform_grid; ptr_uniform_grid = nullptr;
+    logfile << "Simulation finished at " << GetTimeString() << '\n';
     delete m_ms; m_ms = nullptr;
     delete m_ptr_ugrid, m_ptr_ugrid = nullptr;
     delete m_ptr_bbox, m_ptr_bbox = nullptr;
