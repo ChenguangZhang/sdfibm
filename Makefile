@@ -38,9 +38,9 @@ DEBUG 	: CFLAGS+=$(C_DEBUG_FLAGS)
 DEBUG 	: all
 
 SUBDIRS= ./libcollision ./libmotion ./libshape
-.PHONY: $(APPTARGET) $(SUBDIRS)
+.PHONY: $(SUBDIRS) $(APPTARGET)
 
-all: $(APPTARGET) $(SUBDIRS)
+all: $(SUBDIRS) $(APPTARGET)
 
 $(SUBDIRS):
 	$(MAKE) -C $@
