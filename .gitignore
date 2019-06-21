@@ -1,3 +1,5 @@
+# qt creator files
+cpc.*
 # Compiled source #
 ###################
 *.com
@@ -6,6 +8,8 @@
 *.exe
 *.o
 *.so
+*.a
+sdfibm
 
 # Packages #
 ############
