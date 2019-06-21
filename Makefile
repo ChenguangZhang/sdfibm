@@ -25,7 +25,7 @@ LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -lmeshTools
 APPSOURCES=main.cpp solidcloud.cpp
 APPOBJECTS=$(APPSOURCES:.cpp=.o)
 
-APPTARGET=../sdfibm
+APPTARGET=sdfibm
 LIBTARGETLINK=-L. -L./libmotion -lmotion -L./libshape -lshape -L./libshape -lshape -L./libcollision -lcollision
 
 # release

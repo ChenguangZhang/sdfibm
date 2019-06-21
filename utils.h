@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <ctime>
+#include <iomanip>
 #include "types.h"
 
 namespace AsciiColors{
@@ -37,7 +39,7 @@ inline void Quit(const std::string& msg)
     std::exit(1);
 }
 
-std::string GetTimeString(void)
+inline std::string GetTimeString(void)
 {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
