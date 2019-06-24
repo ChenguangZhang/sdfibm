@@ -1,6 +1,7 @@
 #include <queue>
 #include <cstdlib>
 #include <iomanip>
+#include <limits>
 
 #include "Pstream.H"
 #include "solidcloud.h"
@@ -639,10 +640,12 @@ void SolidCloud::saveState(const real& time)
 
 void SolidCloud::saveRestart(const std::string& filename)
 {
+    int ndigits = std::numeric_limits<real>::max_digits10;
     std::ofstream fout(filename);
     if(!fout.good()){
         Quit("Can't open file " + filename + "\n!");
     }
+    fout.precision(ndigits);
     vector v;
     for(Solid& solid : m_solids)
     {
@@ -653,21 +656,11 @@ void SolidCloud::saveRestart(const std::string& filename)
         v = solid.getOrientation().eulerAngles(quaternion::XYZ);
                                 fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
         v = solid.getOmega();   fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+        v = solid.getTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+        v = solid.getFluidForce();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+        v = solid.getFluidTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
     }
 
-    for(Solid& solid : m_planes)
-    {
-        v = solid.getCenter();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getVelocity();fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getForce();   fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-
-        v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getOmega();   fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
-    }
-    fout.flush();
     fout.close();
 }
 
@@ -685,7 +678,10 @@ void SolidCloud::loadRestart(const std::string& filename)
         fin >> x >> y >> z; solid.setVelocity   (vector(x, y, z));
         fin >> x >> y >> z; solid.setForce      (vector(x, y, z));
         fin >> x >> y >> z; solid.setOrientation(vector(x, y, z));
+        fin >> x >> y >> z; solid.setOmega      (vector(x, y, z));
         fin >> x >> y >> z; solid.setTorque     (vector(x, y, z));
+        fin >> x >> y >> z; solid.setFluidForceOld(vector(x, y, z));
+        fin >> x >> y >> z; solid.setFluidTorqueOld(vector(x, y, z));
     }
     fin.close();
 }

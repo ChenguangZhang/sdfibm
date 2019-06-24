@@ -55,6 +55,9 @@ public:
     inline const vector& getTorque()   const {return torque;}
     inline const quaternion& getOrientation() const {return orientation;}
 
+    inline const vector& getFluidForce()  {return fluid_force; }
+    inline const vector& getFluidTorque() {return fluid_torque; }
+
     // setters
     inline void setCenter  (const vector& c){ center = c; }
     inline void setVelocity(const vector& v){ velocity = v; }
@@ -66,6 +69,8 @@ public:
         // from a fixed order of Euler angles
         orientation = quaternion(quaternion::XYZ, angles);
     }
+    inline void setFluidForceOld(const vector& f)  {fluid_force_old = f; }
+    inline void setFluidTorqueOld(const vector& t) {fluid_torque_old= t; }
 
     inline IMotion*   getMotion()   const {return ptr_motion;  }
     inline IShape*    getShape()    const {return ptr_shape;   }
