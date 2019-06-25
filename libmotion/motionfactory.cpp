@@ -56,3 +56,6 @@ REGISTERMOTION(Motion001001);
 REGISTERMOTION(Motion010010);
 #include      "motion100100.h"
 REGISTERMOTION(Motion100100);
+
+#include      "motion01mask.h"
+REGISTERMOTION(Motion01Mask);
