@@ -27,6 +27,7 @@ public:
     }
     inline real getRadius() const { return m_radius;}
     inline real getVolume() const { return m_volume;}
+    inline void setRadius(real r) {m_radius = r;}
 
     // typename and description
     SHAPETYPENAME("Circle")

@@ -9,6 +9,18 @@
 #include "./libmotion/motionfactory.h"
 #include "./libshape/shapefactory.h"
 
+Foam::scalar calcLineFraction(const Foam::scalar& phia, const Foam::scalar& phib)
+{
+    if(phia > 0 && phib > 0)
+        return 0;
+    if(phia < 0 && phib < 0)
+        return 1;
+    if(phia > 0) // phib < 0
+        return -phib/(phia-phib);
+    else
+        return -phia/(phib-phia);
+}
+
 // ctor
 SolidCloud::SolidCloud()
 {
@@ -239,12 +251,14 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
     const Foam::pointField &    pp = mesh.points();
     const Foam::vectorField&    cc = mesh.cellCentres();
     const Foam::scalarField&    cv = mesh.V();
+
+    const Foam::vectorField& faceCentres = mesh.faceCentres();
+    const Foam::vectorField& faceAreas   = mesh.faceAreas();
     // connectivity
     const Foam::labelListList& c2c = mesh.cellCells();
     const Foam::labelListList& c2p = mesh.cellPoints();
 
-    Foam::scalarField& cs = *m_ptr_cs; // cell size field
-    Foam::volScalarField & ct = *m_ptr_ct; // cell type field
+    Foam::volScalarField& ct = *m_ptr_ct; // cell type field
 
     Foam::volScalarField& As = *m_ptr_As;
     Foam::volVectorField& Fs = *m_ptr_Fs;
@@ -263,7 +277,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                 // loop cell vertices
                 forAll(c2p[icell], ivert)
                     insideCount += solid.isInside(pp[c2p[icell][ivert]]);
-                if(insideCount == 8)
+                if(insideCount == c2p[icell].size()) // equals #vertex
                 {
                     hostid = icell;
                     break;
@@ -276,7 +290,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
     vector force  = vector::zero;
     vector torque = vector::zero;
 
-    if(hostid>0)
+    if(hostid>0) // solid overlaps partition
     {
         label innerType = 4 + solid.getID();
         ct[hostid] = innerType;
@@ -322,7 +336,9 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                     int insideCount = 0;
                     // loop cell vertices
                     forAll(c2p[inb], ivert)
+                    {
                         insideCount += solid.isInside(pp[c2p[inb][ivert]]);
+                    }
 
                     if(insideCount == 0)
                     {
@@ -331,11 +347,13 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                         continue;
                     }
 
-                    // at this point the cell is intersected for sure, so we add it to the queue
+                    // at this point the cell is both unvisited & intersected for sure, so we add it to the queue
                     q.push(inb);
 
-                    if(insideCount == 8)
+                    if(insideCount == c2p[inb].size())
+                    {
                         ct[inb] = innerType;
+                    }
                     else
                     {
                         intersectCell.push_back(inb);
@@ -351,7 +369,92 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
 
         for(label icur : intersectCell)
         {
-            real alpha = m_vofCalculator(solid.getShape(), solid.getCenter(), solid.getOrientation(), cs, cc, icur);
+            // build a hash map first to store the sdf of all vertices
+            std::map<int, Foam::scalar> sdf_values; // vertex-id : value pairs
+            const Foam::cell& cell = mesh.cells()[icur];
+            const Foam::labelList& pointids = c2p[icur];
+            forAll(pointids, ipoint)
+            {
+                sdf_values[pointids[ipoint]] = solid.getShape()->signedDistance(pp[pointids[ipoint]], solid.getCenter(), solid.getOrientation());
+            }
+
+            Foam::vector pcell;
+            const Foam::vector& A = pp[pointids[0]];
+            Foam::scalar phiA = sdf_values[pointids[0]];
+            int i;
+            Foam::vector B = Foam::vector::zero;
+            Foam::scalar phiB = 0.0;
+            for(i = 1; i < pointids.size(); ++i)
+            {
+                B = pp[pointids[i]];
+                phiB = sdf_values[pointids[i]];
+                if (phiA * phiB < 0)
+                    break;
+            }
+            pcell = A - std::fabs(phiA)/(std::fabs(phiA)+std::fabs(phiB))*(A-B);
+            if(m_ON_TWOD)
+                pcell[2] = 0.0;
+
+            Foam::scalar volume = 0.0;
+            forAll(cell, iface)
+            {
+                Foam::label faceid = cell[iface];
+                Foam::face myface = mesh.faces()[faceid];
+
+                Foam::label nvertex = myface.size();
+                std::vector<Foam::scalar> phis(nvertex);
+                forAll(myface, ivertex)
+                {
+                    phis[ivertex] = sdf_values[myface[ivertex]];
+                }
+
+                Foam::scalar epsilon_f = 0.0;
+
+                int sign_sum = 0;
+                forAll(myface, ivertex)
+                {
+                    if(phis[ivertex] > 0)
+                        sign_sum += 1;
+                    else
+                        sign_sum -= 1;
+                }
+
+                if(sign_sum == nvertex)
+                    epsilon_f = 0.0;
+                else if(sign_sum ==-nvertex)
+                    epsilon_f = 1.0;
+                else
+                {
+                    const Foam::vector& A = pp[myface[0]];
+                    Foam::scalar phiA = sdf_values[myface[0]];
+
+                    Foam::vector B = Foam::vector::zero;
+                    Foam::scalar phiB = 0.0;
+                    int i;
+                    for(i = 1; i < nvertex; ++i)
+                    {
+                        B = pp[myface[i]];
+                        phiB = sdf_values[myface[i]];
+                        if (phiA * phiB < 0)
+                            break;
+                    }
+
+                    Foam::vector pface = A - phiA/(phiA-phiB)*(A-B);
+
+                    Foam::scalar area = 0.0;
+                    for(int iseg = 0; iseg < nvertex; ++iseg)
+                    {
+                        const Foam::scalar& phiO = phis[iseg];
+                        const Foam::scalar& phiA = phis[(iseg+1)%nvertex];
+                        const Foam::vector& O = pp[myface[iseg]];
+                        const Foam::vector& A = pp[myface[(iseg+1)%nvertex]];
+                        area += std::fabs(0.5*Foam::mag((A-O) ^ (pface-O))) * calcLineFraction(phiO, phiA);
+                    }
+                    epsilon_f = area/Foam::mag(faceAreas[faceid]);
+                }
+                volume += (1.0/3.0)*epsilon_f*std::fabs((pcell - faceCentres[faceid]) & faceAreas[faceid]);
+            }
+            Foam::scalar alpha = volume/mesh.V()[icur];
 
             // below is identical for 2D and 3D
             vector us = solid.evalPointVelocity(cc[icur]);
@@ -508,8 +611,8 @@ void SolidCloud::solidSolidInteract()
     for(CollisionPair& pair : pairs)
     {
         // hardcoded parameters
-        static real crange = 0.03;
-        static real epsilon = 1.0e-5;
+        static real crange = 0.05;
+        static real epsilon = 1.0e-3;
         static real msg = 2.710932;
 
         Solid& s1 = m_solids[pair.first];
@@ -520,7 +623,7 @@ void SolidCloud::solidSolidInteract()
 
         if(contact_depth < 0) continue;
         vector contact_normal = Foam::normalised(s1.getCenter() - s2.getCenter());
-        vector force = msg/epsilon*contact_depth*contact_depth*contact_depth*contact_depth*contact_normal;
+        vector force = msg/epsilon*contact_depth*contact_depth*contact_normal;
         vector torque = vector::zero;
 
         s1.addForceAndTorque( force, torque);

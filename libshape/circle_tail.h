@@ -39,26 +39,28 @@ public:
     virtual std::string description() const override {return "Circle_Tail (x-y plane), r = " + std::to_string(m_radius);}
 
     virtual inline bool isInside(
-            const vector& p,
+            const vector& pworld,
             const vector& shape_center,
             const quaternion& shape_orientation) const override
     {
-        vector porigin = m_com + transform(p, shape_center, shape_orientation);
+        vector p = m_com + transform(pworld, shape_center, shape_orientation);
+        p.z() = 0.0;
 
-        bool b1 = _sdf_rectangle_bool(_sdf_offset(porigin, vector(m_radiusa, 0.0, 0.0)), m_radiusa, m_radiusb);
-        bool b2 = _sdf_circle_bool_fast(vector(porigin.x(), porigin.y(), 0.0), m_radiusSQR);
+        bool b1 = _sdf_rectangle_bool(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)), m_radiusa, m_radiusb);
+        bool b2 = _sdf_circle_bool_fast(vector(p.x(), p.y(), 0.0), m_radiusSQR);
         return _sdf_union({b1, b2});
     }
 
     virtual inline real signedDistance(
-            const vector& p,
+            const vector& pworld,
             const vector& shape_center,
             const quaternion& shape_orientation) const override
     {
-        vector porigin = m_com + transform(p, shape_center, shape_orientation);
+        vector p = m_com + transform(pworld, shape_center, shape_orientation);
+        p.z() = 0.0;
 
-        real d1 = _sdf_circle_real(porigin, m_radius);
-        real d2 = _sdf_rectangle_real(_sdf_offset(porigin, vector(m_radiusa, 0.0, 0.0)),
+        real d1 = _sdf_circle_real(p, m_radius);
+        real d2 = _sdf_rectangle_real(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)),
                             m_radiusa, m_radiusb);
 
         return _sdf_filter(_sdf_union({d1, d2}));
