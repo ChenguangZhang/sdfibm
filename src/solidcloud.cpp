@@ -611,8 +611,8 @@ void SolidCloud::solidSolidInteract()
     for(CollisionPair& pair : pairs)
     {
         // hardcoded parameters
-        static real crange = 0.05;
-        static real epsilon = 1.0e-3;
+        static real crange = 0.01;
+        static real epsilon = 1.0e-5;
         static real msg = 2.710932;
 
         Solid& s1 = m_solids[pair.first];
