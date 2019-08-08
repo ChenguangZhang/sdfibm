@@ -93,7 +93,7 @@ SolidCloud::SolidCloud()
 
             m_libshape[name] = ShapeFactory::create(type, para);
             if(m_libshape[name] == nullptr)
-                throw("Unrecognized shape type " + type);
+                throw std::runtime_error(std::string("Unrecognized shape type " + type + '\n'));
             m_radiusB = std::max(m_radiusB, m_libshape[name]->getRadiusB());
 
             if(Foam::Pstream::master())
@@ -121,7 +121,7 @@ SolidCloud::SolidCloud()
             std::string name = Foam::word(para.lookup("name"));
             m_libmotion[name] = MotionFactory::create(type, para);
             if(m_libmotion[name] == nullptr)
-               throw("Unrecognized motion type " + type);
+               throw std::runtime_error(std::string("Unrecognized motion type " + type + '\n'));
 
             if(Foam::Pstream::master())
                 logfile << "[+] " << type << " as " << name << " (" << m_libmotion[name]->description() << ")\n";
@@ -144,14 +144,18 @@ SolidCloud::SolidCloud()
             }
             else
             {
-                throw("Unrecognizable material parameter!");
+                throw std::runtime_error("Unrecognizable material parameter!");
             }
        }
     }
     catch (const std::exception& e)
     {
         if(Foam::Pstream::master())
+        {
+            std::cout << e.what();
             logfile << "Error when creating shape/motion/material!" << e.what() << '\n';
+        }
+        std::exit(1);
     }
 
     // create solids
