@@ -19,7 +19,15 @@ Then
 cd sdfibm/src
 make
 ```
-The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location.
+The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location.  
+For example, if the sdfibm is installed under home directory:
+```
+export PATH=$PATH:~/sdfibm/src
+```
+Then source bash
+```
+source ~/.bashrc
+```
 
 # Important
 ## 2D simulation
