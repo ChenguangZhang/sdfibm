@@ -54,7 +54,7 @@ There are 19 columns.
 > names = ["t", "x", "y", "z", "vx", "vy", "vz", "fx", "fy", "fz", "EulerAx", "EulerAy", "EulerAz", "wx", "wy", "wz", "Tx", "Ty", "Tz"]
 
 In words, they are:  
-> Time, x-axis, y-axis, z-axis, x-velocity, y-velocity, z-velocity, force-in-x-direction, force-in-y-direction, force-in-z-direction, Euler_angle-x, Euler_angle-y, Euler_angle-z, angular_velocity-x, angular_velocity-y, angular_velocity-z, torque-x, torque-y, torque-z
+> Time, position-x, position-x, position-z, velocity-x, velocity-y, velocity-z, force-x, force-y, force-z, Euler_angle-x, Euler_angle-y, Euler_angle-z, angular_velocity-x, angular_velocity-y, angular_velocity-z, torque-x, torque-y, torque-z
 
 
 # How to Cite
