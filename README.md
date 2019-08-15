@@ -19,7 +19,15 @@ Then
 cd sdfibm/src
 make
 ```
-The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location.
+The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location.  
+For example, if the sdfibm is installed under home directory:
+```
+export PATH=$PATH:~/sdfibm/src
+```
+Then source bash
+```
+source ~/.bashrc
+```
 
 # Important
 ## 2D simulation
@@ -33,7 +41,7 @@ You can see an example in the [example](./example) folder, it include the 2D "fl
 
 # Code files
 - `libshape` contains shape definitions using SDF
-    - `ishape.h` the virtual base class all shapes inherit from. It also contains many SDF transformation and Boolean utilities 
+    - `ishape.h` the virtual base class all shapes inherit from. It also contains many SDF transformation and Boolean utilities
     - `shapefactory.h` implement the factory design pattern, it holds a library of shapes that are used in the `SolidCloud` class
     - `template.h` a heavily annotated template for creating new shapes, place to change are marked by `CHANGE`
     - `circle.h` a circle of radius $r$
@@ -47,6 +55,16 @@ You can see an example in the [example](./example) folder, it include the 2D "fl
 - `solid.h` corresponds to the individual solid. It keeps and updates the kinematic and dynamic information of a solid. It also holds pointers to shape/motion/material instances obtained from the corresponding libraries in the `SolidCloud` class.
 - `main.cpp` implements the projection method and the direct forcing IBM
 
+# Result file
+The particle simulation result is saved in the cloud.out file.
+
+There are 19 columns.
+> names = ["t", "x", "y", "z", "vx", "vy", "vz", "fx", "fy", "fz", "EulerAx", "EulerAy", "EulerAz", "wx", "wy", "wz", "Tx", "Ty", "Tz"]
+
+In words, they are:  
+> Time, position-x, position-x, position-z, velocity-x, velocity-y, velocity-z, force-x, force-y, force-z, Euler_angle-x, Euler_angle-y, Euler_angle-z, angular_velocity-x, angular_velocity-y, angular_velocity-z, torque-x, torque-y, torque-z
+
+
 # How to Cite
 Please cite the following paper if you use this code, thanks!
 
@@ -59,4 +77,3 @@ Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric 
 
 # License
 Under [GPLv3 License](https://opensource.org/licenses/GPL-3.0).
-
