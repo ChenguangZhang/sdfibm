@@ -19,15 +19,11 @@ Then
 cd sdfibm/src
 make
 ```
-The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location.  
-For example, if the sdfibm is installed under home directory:
+The compiled binary is `sdfibm` under the `src` directory. You can soft-link it to your desire location. For example, if the repo is cloned under home directory, then after compilation you can use
 ```
-export PATH=$PATH:~/sdfibm/src
+sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm
 ```
-Then source bash
-```
-source ~/.bashrc
-```
+to soft-link the binary to the system wide path, note that in this specific case admin privilege is required.
 
 # Important
 ## 2D simulation
@@ -35,7 +31,7 @@ source ~/.bashrc
 
 
 # Example
-You can see an example in the [example](./example) folder, it include the 2D "flow past cylinder" case at $Re=200$ (animation below), the Taylor-Couette flow with movable core, and a settling ellipse in a rectangular container.
+You can see an example in the [example](./examples) folder, it include the 2D "flow past cylinder" case at $Re=200$ (animation below), the Taylor-Couette flow with movable core, and a settling ellipse in a rectangular container.
 
 ![Re200](./figs/flow_past_cylinder_re200.gif)
 
