@@ -294,7 +294,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
     vector force  = vector::zero;
     vector torque = vector::zero;
 
-    if(hostid>0) // solid overlaps partition
+    if(hostid>=0) // solid overlaps partition
     {
         label innerType = 4 + solid.getID();
         ct[hostid] = innerType;
