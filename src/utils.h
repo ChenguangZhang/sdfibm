@@ -5,6 +5,8 @@
 #include <iomanip>
 #include "types.h"
 
+namespace sdfibm{
+
 namespace AsciiColors{
     static const std::string COLOR_NORMAL ="\033[0m";
     static const std::string COLOR_RED    ="\033[0;31;49m";
@@ -18,7 +20,6 @@ namespace AsciiColors{
     static const std::string COLOR_WARNING="\033[4;33;49m";
     static const std::string COLOR_ERROR  ="\033[1;31;43m";
 }
-
 
 inline void PrintInfo(const std::string& message)
 {
@@ -39,7 +40,8 @@ inline void Quit(const std::string& msg)
     std::exit(1);
 }
 
-inline std::string GetTimeString(void)
+// below requires rather new c++ version
+inline std::string GetTimeStringNew()
 {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
@@ -48,5 +50,14 @@ inline std::string GetTimeString(void)
     return ss.str();
 }
 
+inline std::string GetTimeString()
+{
+    char buf[80];
+    time_t t = time(NULL);
+    struct tm *tstruct = localtime(&t);
+    strftime(buf, sizeof(buf), "%y/%m/%d %X", tstruct);
+    return buf;
+}
 
+}
 #endif

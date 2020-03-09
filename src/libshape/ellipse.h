@@ -2,6 +2,7 @@
 #define ELLIPSE_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Ellipse : public IShape, _shapecreator<Ellipse>
 {
@@ -62,4 +63,6 @@ public:
         );
     }
 };
+
+}
 #endif

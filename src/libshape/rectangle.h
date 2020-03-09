@@ -2,6 +2,7 @@
 #define RECTANGLE_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Rectangle : public IShape, _shapecreator<Rectangle>
 {
@@ -60,4 +61,6 @@ public:
         );
     }
 };
+
+}
 #endif

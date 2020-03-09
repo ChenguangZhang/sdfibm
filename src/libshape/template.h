@@ -2,6 +2,7 @@
 #define CHANGE_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class CHANGE : public IShape, _shapecreator<CHANGE>
 {
@@ -52,4 +53,6 @@ public:
         return _sdf_filter(_sdf_circle_real(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radius)); // CHANGE
     }
 };
+
+}
 #endif

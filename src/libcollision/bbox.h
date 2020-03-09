@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+namespace sdfibm {
 struct BBox
 {
     double low[3], high[3];
@@ -18,8 +19,11 @@ struct BBox
 
     void report(std::ostream& os = std::cout) const
     {
-        os << "BBox\n low: " << low[0] << ' ' << low[1] << ' ' << low[2] << '\n' << "high: " << high[0] << ' ' << high[1] << ' ' << high[2] << '\n';
+        char msg[200];
+        sprintf(msg, "[BBox] [%g,%g,%g]x[%g,%g,%g]\n", low[0], low[1], low[2], high[0], high[1], high[2]);
+        os << msg;
     }
 };
 
+}
 #endif // BOUNDINGBOX_HPP

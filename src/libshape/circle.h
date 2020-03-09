@@ -2,6 +2,7 @@
 #define CIRCLE_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Circle : public IShape, _shapecreator<Circle>
 {
@@ -50,4 +51,5 @@ public:
         return _sdf_filter(_sdf_circle_real(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radius));
     }
 };
+}
 #endif

@@ -22,7 +22,7 @@ LDFLAGS =-lm
 LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -lmeshTools
 
 
-APPSOURCES=main.cpp solidcloud.cpp
+APPSOURCES=main.cpp solidcloud.cpp logger.cpp
 APPOBJECTS=$(APPSOURCES:.cpp=.o)
 
 APPTARGET=sdfibm

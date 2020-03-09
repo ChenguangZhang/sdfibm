@@ -2,6 +2,7 @@
 #define CIRCLE_TAIL_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Circle_Tail : public IShape, _shapecreator<Circle_Tail>
 {
@@ -66,4 +67,6 @@ public:
         return _sdf_filter(_sdf_union({d1, d2}));
     }
 };
+
+}
 #endif

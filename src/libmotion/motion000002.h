@@ -2,6 +2,7 @@
 #define MOTION000002_H
 
 #include "imotion.h"
+namespace sdfibm{
 
 class Motion000002:public IMotion, _creator<Motion000002>
 {
@@ -39,4 +40,5 @@ void Motion000002::constraint(const real &time, vector &velocity, vector &omega)
     std::cout << "set motion Motion000002 to" << m_omega << std::endl;
 }
 
+}
 #endif // MOTION000002_H

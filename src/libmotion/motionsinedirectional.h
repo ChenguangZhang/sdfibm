@@ -2,6 +2,7 @@
 #define MOTIONSINEDIRECTIONAL_H
 
 #include "imotion.h"
+namespace sdfibm{
 
 class MotionSineDirectional:public IMotion, _creator<MotionSineDirectional>
 {
@@ -46,5 +47,5 @@ void MotionSineDirectional::constraint(const real &time, vector &velocity, vecto
     omega    = vector::zero;
 }
 
-
+}
 #endif // MOTIONSINEDIRECTIONAL_H

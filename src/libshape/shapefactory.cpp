@@ -2,9 +2,10 @@
 #include "shapefactory.h"
 
 #include <iostream>
+namespace sdfibm{
 
 #define REGISTERSHAPE(m) \
-    bool m::added = ShapeFactory::add(m::typeName(), m::create);
+    bool sdfibm::m::added = ShapeFactory::add(sdfibm::m::typeName(), sdfibm::m::create);
 
 bool ShapeFactory::add(const string& name, TCreateMethod create_method)
 {
@@ -30,6 +31,8 @@ IShape* ShapeFactory::create(const string& name, const dictionary& para)
 
 std::map<string, ShapeFactory::TCreateMethod> ShapeFactory::m_methods;
 
+}
+
 // add shapes
 #include "circle.h"
 REGISTERSHAPE(Circle);
@@ -54,3 +57,7 @@ REGISTERSHAPE(Circle_TwoTail);
 
 #include "box.h"
 REGISTERSHAPE(Box);
+
+#include "plane.h"
+REGISTERSHAPE(Plane);
+

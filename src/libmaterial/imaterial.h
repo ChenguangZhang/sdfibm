@@ -1,7 +1,8 @@
 #ifndef IMATERIAL_HPP
 #define IMATERIAL_HPP
 
-#include "types.h"
+#include "../types.h"
+namespace sdfibm{
 
 class IMaterial
 {
@@ -22,4 +23,5 @@ public:
     MaterialDefault():IMaterial() {}
 };
 
+}
 #endif

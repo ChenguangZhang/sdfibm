@@ -1,0 +1,2 @@
+first: cp alpha.water.orig 0/alpha.water
+second: ../smoothvof

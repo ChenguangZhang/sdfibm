@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include "../types.h"
+namespace sdfibm{
 
 class IMotion;
 
@@ -34,4 +35,5 @@ private:
     static std::map<string, TCreateMethod> m_methods;
 };
 
+}
 #endif

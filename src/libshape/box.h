@@ -2,6 +2,7 @@
 #define BOX_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Box : public IShape, _shapecreator<Box>
 {
@@ -61,4 +62,6 @@ public:
         );
     }
 };
+
+}
 #endif

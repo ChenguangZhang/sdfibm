@@ -2,6 +2,7 @@
 #define ELLIPSOID_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Ellipsoid : public IShape, _shapecreator<Ellipsoid>
 {
@@ -67,4 +68,6 @@ public:
         );
     }
 };
+
+}
 #endif

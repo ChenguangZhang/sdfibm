@@ -2,6 +2,7 @@
 #define CIRCLE_TWOTAIL_H
 
 #include "ishape.h"
+namespace sdfibm{
 
 class Circle_TwoTail : public IShape, _shapecreator<Circle_TwoTail>
 {
@@ -74,4 +75,6 @@ public:
         );
     }
 };
+
+}
 #endif

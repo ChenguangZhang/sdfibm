@@ -17,20 +17,14 @@ FoamFile
 
 meta
 {
-  on_fluid 1;
-  on_twod  1;
-  gravity  (0.0 -10.0 0.0);
+    on_fluid 1;
+    on_twod  1;
+    gravity  (0.0 -10.0 0.0);
 }
   
 shapes
 {
     shape1
-    {
-        name circle1;
-        type Circle;
-        radius 0.4;
-    }
-    shape2
     {
         name ellipse1;
         type Ellipse;
@@ -67,12 +61,6 @@ motions
       name onlyzrot1;
       type Motion000001;
     }
-    motion4
-    {
-      name rotor1;
-      type Motion000002;
-      period 1;
-    }
 }
 
 solids
@@ -87,3 +75,5 @@ solids
       euler (0.0 0.0 0.0);
     }
 }
+
+planes {}

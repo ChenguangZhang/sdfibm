@@ -1,0 +1,1100 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6.0.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solids;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+meta
+{
+  on_fluid 1;
+  on_twod  1;
+  gravity  (0.0 -10.0 0.0);
+}
+  
+shapes
+{
+    shape1
+    {
+        name circle1;
+        type Circle;
+        radius 0.15;
+    }
+    shape2
+    {
+        name plane1;
+        type Plane;
+    }
+}
+
+materials
+{
+    material1
+    {
+      name mat1;
+      type General;
+      rho 3.0;
+    }
+}
+
+motions
+{
+    motion1
+    {
+       name free1;
+       type Motion111111;
+    }
+    motion2
+    {
+      name static1;
+      type Motion000000;
+    }
+    motion3
+    {
+      name onlyzrot1;
+      type Motion000001;
+    }
+}
+
+solids
+{
+    solid1
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid2
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid3
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid4
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid5
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid6
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid7
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid8
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid9
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid10
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 4.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid11
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid12
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid13
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid14
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid15
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid16
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid17
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid18
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid19
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid20
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 4.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid21
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid22
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid23
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid24
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid25
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid26
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid27
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid28
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid29
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid30
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 5 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid31
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid32
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid33
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid34
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid35
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid36
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid37
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid38
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid39
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid40
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 5.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid41
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid42
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid43
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid44
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid45
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid46
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid47
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid48
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid49
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid50
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 5.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid51
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid52
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid53
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid54
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid55
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid56
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid57
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid58
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid59
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid60
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 6.2 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid61
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid62
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid63
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid64
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid65
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid66
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid67
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid68
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid69
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid70
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 6.6 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid71
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid72
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid73
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid74
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid75
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid76
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid77
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid78
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid79
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid80
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 7 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid81
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid82
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid83
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid84
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid85
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid86
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid87
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid88
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid89
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid90
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 7.4 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid91
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.8 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid92
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1.4 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid93
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-1 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid94
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.6 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid95
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (-0.2 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid96
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.2 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid97
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (0.6 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid98
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid99
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.4 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+
+    solid100
+    {
+      shp_name circle1;
+      mot_name free1;
+      mat_name mat1;
+      pos (1.8 7.8 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+}
+planes
+{
+    plane1
+    {
+      shp_name plane1;
+      mot_name static1;
+      mat_name mat1;
+      pos (0.0 0.0 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 0.0);
+    }
+    plane2
+    {
+      shp_name plane1;
+      mot_name static1;
+      mat_name mat1;
+      pos (-4.0 0.0 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 -90.0);
+    }
+    plane3
+    {
+      shp_name plane1;
+      mot_name static1;
+      mat_name mat1;
+      pos (4.0 0.0 0.0);
+      vel (0.0 0.0 0.0);
+      euler (0.0 0.0 90.0);
+    }
+}

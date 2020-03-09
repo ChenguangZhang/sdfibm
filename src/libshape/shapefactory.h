@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include "../types.h"
+namespace sdfibm{
 
 class IShape;
 
@@ -13,7 +14,7 @@ public:
     using TCreateMethod = IShape* (*)(const dictionary&);
 
 public:
-    // ideally should be a singleton (TODO?), for now just disable ctor
+    // could be a singleton, for now just disable ctor
     ShapeFactory() = delete;
 
     static bool add(const string& name, TCreateMethod create_method);
@@ -34,4 +35,5 @@ private:
     static std::map<string, TCreateMethod> m_methods;
 };
 
+}
 #endif

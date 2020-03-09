@@ -2,18 +2,20 @@
 #include <cstdlib>
 #include <iomanip>
 #include <limits>
-
+#include <chrono>
 #include "Pstream.H"
+#include "cpuTime.H"
 #include "solidcloud.h"
-#include "./libshape/vof.h"
+#include "sstream"
 #include "./libmotion/motionfactory.h"
 #include "./libshape/shapefactory.h"
+namespace sdfibm{
 
 Foam::scalar calcLineFraction(const Foam::scalar& phia, const Foam::scalar& phib)
 {
     if(phia > 0 && phib > 0)
         return 0;
-    if(phia < 0 && phib < 0)
+    if(phia <= 0 && phib <= 0)
         return 1;
     if(phia > 0) // phib < 0
         return -phib/(phia-phib);
@@ -21,35 +23,16 @@ Foam::scalar calcLineFraction(const Foam::scalar& phia, const Foam::scalar& phib
         return -phia/(phib-phia);
 }
 
-// ctor
-SolidCloud::SolidCloud()
+void SolidCloud::initFromDictionary(const Foam::word& dictfile)
 {
+    Foam::IFstream ifstream = Foam::IFstream(dictfile);
+    dictionary root(ifstream());
     if(Foam::Pstream::master())
     {
-        logfile.open("cloud.log");
-        logfile << GenBanner("INIT SOLIDCLOUD");
+        std::ostringstream msg;
+        msg << "Init from " << dictfile;
+        LOG(msg.str());
     }
-    m_solids.reserve(10);
-    m_planes.reserve(10);
-
-    //collision_pairs.reserve(100);
-    //ptr_uniform_grid = nullptr;
-    //collisionFunctionTableInit();
-
-    m_ptr_Mesh = nullptr;
-    m_ptr_Uf = nullptr;
-    m_ptr_As = nullptr;
-    m_ptr_Fs = nullptr;
-    m_ptr_Ts = nullptr;
-    m_ptr_ct = nullptr;
-
-    // init output file, append if file exists, create if not
-    statefile.open("cloud.out", std::fstream::out | std::fstream::app);
-    statefile << std::scientific;
-
-    dictionary root(Foam::IFstream("solidDict")());
-    if(Foam::Pstream::master())
-        logfile << "reading solids from: " << root.name() << '\n';
 
     // meta information
     const dictionary& meta = root.subDict("meta");
@@ -57,31 +40,30 @@ SolidCloud::SolidCloud()
     m_ON_TWOD  = Foam::readBool(meta.lookup("on_twod"));
     m_gravity = meta.lookup("gravity");
 
-    // output meta information
+    // log meta information
     if(Foam::Pstream::master())
     {
-        logfile << GenBanner("SUMMARY");
+        std::ostringstream msg;
         string dim = m_ON_TWOD ? "2D" : "3D";
         string type = m_ON_FLUID? "FSI": "DEM (fluid disabled)";
-        logfile << dim << ' ' << type << " simulation with g = " << "("<<m_gravity[0]<<' '<< m_gravity[1]<<' '<< m_gravity[2]<<")\n";
-        logfile << "Binary was compiled at " << __DATE__ << ' ' << __TIME__ << '\n';
-        logfile << "Simulation starts   at " << GetTimeString() << '\n';
-    }
-    if (m_ON_TWOD)
-        m_vofCalculator = cellFraction2D;
-    else
-        m_vofCalculator = cellFraction3D;
 
+        msg << "Summary: "
+            << dim << ' ' 
+            << type << ", "
+            << "g = " << "("<<m_gravity[0]<<' '<< m_gravity[1]<<' '<< m_gravity[2]<<"). ";
+        msg << "Binary built at " << __DATE__ << ' ' << __TIME__ << '\n';
+        LOG(msg.str());
+    }
 
    // read and create shape, motion, and material
    try {
         // read and create shapes
         if(Foam::Pstream::master())
         {
-            logfile << GenBanner("CREATE: SHAPES");
-            logfile << "--> Available shape types:\n";
-            ShapeFactory::report(logfile);
-            logfile << "--> Used shapes:\n";
+            LOGF << GenBanner("CREATE: SHAPES");
+            LOGF << "--> Available shape types:\n";
+            ShapeFactory::report(LOGF);
+            LOGF << "--> Used shapes:\n";
         }
         const dictionary& shapes = root.subDict("shapes");
         m_radiusB = -1.0;
@@ -97,21 +79,22 @@ SolidCloud::SolidCloud()
             m_radiusB = std::max(m_radiusB, m_libshape[name]->getRadiusB());
 
             if(Foam::Pstream::master())
-                logfile << "[+] " << type << " as " << name << " (" << m_libshape[name]->description() << ")\n";
+                LOGF << "[+] " << type << " as " << name << " (" << m_libshape[name]->description() << ")\n";
         }
-        // find the maximum bounding raidus
+
+        // find the maximum bounding radius, used to create the uniform grid for collision detection
         if(Foam::Pstream::master())
         {
-            logfile << "maximum bounding raidus is " << m_radiusB << '\n';
+            LOGF << "maximum bounding raidus is " << m_radiusB << '\n';
         }
 
         // read and create motions
         if(Foam::Pstream::master())
         {
-            logfile << GenBanner("CREATE: MOTIONS");
-            logfile << "--> Available motion types:\n";
-            MotionFactory::report(logfile);
-            logfile << "--> Used motions:\n";
+            LOGF << GenBanner("CREATE: MOTIONS");
+            LOGF << "--> Available motion types:\n";
+            MotionFactory::report(LOGF);
+            LOGF << "--> Used motions:\n";
         }
         const dictionary& motions = root.subDict("motions");
         for (int i=0; i < motions.size(); ++i)
@@ -124,12 +107,12 @@ SolidCloud::SolidCloud()
                throw std::runtime_error(std::string("Unrecognized motion type " + type + '\n'));
 
             if(Foam::Pstream::master())
-                logfile << "[+] " << type << " as " << name << " (" << m_libmotion[name]->description() << ")\n";
+                LOGF << "[+] " << type << " as " << name << " (" << m_libmotion[name]->description() << ")\n";
         }
 
         // read and create materials
         if(Foam::Pstream::master())
-            logfile << GenBanner("CREATE: MATERIALS");
+            LOGF << GenBanner("CREATE: MATERIALS");
         const dictionary& materials = root.subDict("materials");
         for (int i=0; i < materials.size(); ++i)
         {
@@ -153,29 +136,26 @@ SolidCloud::SolidCloud()
         if(Foam::Pstream::master())
         {
             std::cout << e.what();
-            logfile << "Error when creating shape/motion/material!" << e.what() << '\n';
+            LOGF << "Error when creating shape/motion/material!" << e.what() << '\n';
         }
         std::exit(1);
     }
 
     // create solids
     if(Foam::Pstream::master())
-        logfile << GenBanner("CREATE: SOLIDS");
+        LOGF << GenBanner("CREATE: SOLIDS & PLANES");
 
     const dictionary &solids = root.subDict("solids");
     forAll(solids, i)
     {
         const dictionary &solid = solids.subDict(solids.toc()[i]);
 
-        // read pos
         vector pos = solid.lookup("pos");
         if (m_ON_TWOD)
         {
-            // sanity check for 2d simulation: the solid must have z = 0
+            // sanity check for 2d simulation: solid must have z = 0
             if(pos.z() !=  0)
-            {
-                Quit("Solid must has z=0 in 2D simulation, violated by solid number " + std::to_string(i));
-            }
+                Quit("Solid must has z=0 in 2D simulation, violated by solid # " + std::to_string(i));
         }
         // create solid
         Solid s(i, pos, quaternion::I);
@@ -197,19 +177,83 @@ SolidCloud::SolidCloud()
         this->addSolid(s);
 
         if(Foam::Pstream::master())
-            logfile << "Solid " << i << ":" << " motion = " << mot_name
+            LOGF << "Solid " << i << ":" << " motion = " << mot_name
                 << ", material = " << mat_name << ", shape = " << shp_name << "\n";
     }
+
+    const dictionary &planes = root.subDict("planes");
+    label i0 = m_solids.size();
+    forAll(planes, i)
+    {
+        const dictionary &plane = planes.subDict(planes.toc()[i]);
+
+        vector pos = plane.lookup("pos");
+        if (m_ON_TWOD)
+        {
+            // sanity check for 2d simulation: plane must have z = 0
+            if(pos.z() !=  0)
+                Quit("Plane must has z=0 in 2D simulation, violated by plane # " + std::to_string(i));
+        }
+        // create plane
+        Solid s(i + i0, pos, quaternion::I);
+        // read velocity, euler angle, angular velocity
+        vector vel = plane.lookupOrDefault("vel", vector::zero);
+        s.setVelocity(vel);
+        vector euler = plane.lookupOrDefault("euler", vector::zero);
+        s.setOrientation(euler*M_PI/180.0);
+        vector omega = plane.lookupOrDefault("omega", vector::zero);
+        s.setOmega(omega);
+
+        // add motion, material, and shape
+        std::string mot_name = Foam::word(plane.lookup("mot_name"));
+        std::string mat_name = Foam::word(plane.lookup("mat_name"));
+        std::string shp_name = Foam::word(plane.lookup("shp_name"));
+        if(mot_name!="free")
+            s.setMotion(m_libmotion[mot_name]);
+        s.setMaterialAndShape(m_libmat[mat_name], m_libshape[shp_name]);
+        this->addPlane(s);
+
+        if(Foam::Pstream::master())
+            LOGF << "Plane " << i << ":" << " motion = " << mot_name
+                << ", material = " << mat_name << ", shape = " << shp_name << "\n";
+    }
+    m_solidDict = root; // keep a copy
+}
+
+// ctor
+SolidCloud::SolidCloud(const Foam::word& dictfile)
+{
+    m_solids.reserve(10);
+    m_planes.reserve(10);
+
+    collision_pairs.reserve(100);
+    m_ptr_ugrid = nullptr;
+    InitCollisionFuncTable();
+    m_ptr_Mesh = nullptr;
+    m_ptr_Uf = nullptr;
+    m_ptr_As = nullptr;
+    m_ptr_Fs = nullptr;
+    m_ptr_Ts = nullptr;
+    m_ptr_ct = nullptr;
+
+    // open output file, overwrite if file exists
+    statefile.open("cloud.out", std::fstream::out);
+    statefile << std::scientific;
+
+    initFromDictionary(Foam::word(dictfile));
+
     if(Foam::Pstream::master())
     {
-        logfile << "Totally [" << solids.size() << "] solids.\n";
-        logfile << GenBanner("END OF INIT");
+        LOGF << "Totally [" << m_solids.size() << "] solids and [" << m_planes.size() << "] planes.\n";
+        LOGF << GenBanner("END OF INIT");
+        LOGF << '\n';
     }
 }
 
 SolidCloud::~SolidCloud()
 {
-    logfile << "Simulation finished at " << GetTimeString() << '\n';
+    if(Foam::Pstream::master())
+        LOG("Simulation finished! Congratulations!");
     delete m_ms; m_ms = nullptr;
     delete m_ptr_ugrid, m_ptr_ugrid = nullptr;
     delete m_ptr_bbox, m_ptr_bbox = nullptr;
@@ -219,16 +263,18 @@ SolidCloud::~SolidCloud()
         m_ptr_cs = nullptr;
     }
     statefile.close();
-    logfile.close();
 }
 
 void SolidCloud::initialCorrect()
 {
     this->interact(0, 1);
-    m_ptr_As->write(); // write to the zero directory
-    logfile << "Initial solid volume field written to 0 directory\n";
+    m_ptr_As->write();
+    if(Foam::Pstream::master())
+        LOG("Initial As written to 0 directory");
     for(Solid& solid : m_solids)
+    {
         solid.clearForceAndTorque();
+    }
 }
 
 void SolidCloud::fixInternal()
@@ -283,6 +329,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                     insideCount += solid.isInside(pp[c2p[icell][ivert]]);
                 if(insideCount == c2p[icell].size()) // equals #vertex
                 {
+                    // Foam::Pout << solid.getShape()->getTypeName() << " has " << hostid << " updated to " << icell << " at " << Foam::Pstream::myProcNo() << '\n';
                     hostid = icell;
                     break;
                 }
@@ -303,6 +350,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
         std::queue<int> q;
         q.push(hostid);
         std::vector<int> intersectCell;
+        std::vector<int> visitedOutCell;
 
         real dtINV = 1.0/dt;
         while(!q.empty())
@@ -348,6 +396,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                     {
                         // cell totally outside of solid, no need to proceed, but we still need to mark it as "visited"
                         ct[inb] = 1;
+                        visitedOutCell.push_back(inb);
                         continue;
                     }
 
@@ -370,6 +419,10 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
                 }
             }
         }
+        for(label icur : intersectCell)
+            ct[icur] = 0;
+        for(label icur : visitedOutCell)
+            ct[icur] = 0;
 
         for(label icur : intersectCell)
         {
@@ -470,35 +523,41 @@ void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
             force += localforce;
             torque+= (cc[icur]-solid.getCenter()) ^ localforce;
 
-            Fs[icur] = localforce/cv[icur];
-            As[icur] = alpha;
-            Ts[icur] = alpha;
+            Fs[icur] += localforce/cv[icur];
+            As[icur] += alpha;
+            if(As[icur] > 1)
+                As[icur] = 1;
+            Ts[icur] += alpha;
         }
 
         force  *= m_rho;
         torque *= m_rho;
     }
 
-    // a solid can cover several parallel partitions, with each contributing a "partial" force
-    // they are added together
+    // a solid may cover several parallel partitions, each contributing a "partial" force
+    // need parallel reduction
     if(Foam::Pstream::parRun())
     {
+        // Foam::Pout << "Processor " << Foam::Pstream::myProcNo() << force << ' ' << torque << '\n';
         // init *PerCPU to be local copies
-        Foam::vector forcePerCPU ((force));
-        Foam::vector torquePerCPU((torque));
-        // parallel reduce
+        Foam::vector forcePerCPU (force);
+        Foam::vector torquePerCPU(torque);
+        // parallel reduction
         Foam::reduce(forcePerCPU , Foam::sumOp<Foam::vector>());
         Foam::reduce(torquePerCPU, Foam::sumOp<Foam::vector>());
         // now *PerCPU contain the global sum
         force = forcePerCPU;
         torque= torquePerCPU;
+        Foam::Pstream::scatter(force);
+        Foam::Pstream::scatter(torque);
     }
     solid.setFluidForceAndTorque(force, torque);
 }
 
-void SolidCloud::linkMesh(const Foam::fvMesh& mesh)
+void SolidCloud::linkFluid(const Foam::volVectorField& U)
 {
-    m_ON_RESTART = false;
+    const Foam::fvMesh& mesh = U.mesh();
+
     m_ptr_Mesh= &(const_cast<Foam::fvMesh&>(mesh));
     // create bounding box
     Foam::vector low  = mesh.bounds().min();
@@ -506,33 +565,14 @@ void SolidCloud::linkMesh(const Foam::fvMesh& mesh)
     real a[3] = {low.x(), low.y(), low.z()};
     real b[3] = {high.x(),high.y(),high.z()};
     m_ptr_bbox = new BBox(a, b);
-    m_ptr_bbox->report(logfile);
+    m_ptr_bbox->report(std::cout);
     m_ptr_ugrid = new UGrid(*m_ptr_bbox, 2*m_radiusB);
 
+    m_ON_RESTART = false;
     if(mesh.time().value() > 0)
-    {
-        std::string filename;
-        if(!Foam::Pstream::parRun())
-            filename = "./" + mesh.time().timeName() + "/restart";
-        else
-            // when parallel, all init from the master
-            filename = "./processor0/" + mesh.time().timeName() + "/restart";
-        logfile << "Restart from " << filename << std::endl;
-        loadRestart(filename);
         m_ON_RESTART = true;
-    }
-    else
-    {
-        std::cout << "New simulation, starting from 0\n";
-    }
 
-}
-
-void SolidCloud::linkFluid(const Foam::volVectorField& U)
-{
-    const Foam::fvMesh& mesh = U.mesh();
     m_ms = new Foam::meshSearch(mesh);
-
     m_ptr_Uf  = &(const_cast<Foam::volVectorField&>(mesh.lookupObject<Foam::volVectorField>("U")));
     m_ptr_As  = &(const_cast<Foam::volScalarField&>(mesh.lookupObject<Foam::volScalarField>("As")));
     m_ptr_ct  = &(const_cast<Foam::volScalarField&>(mesh.lookupObject<Foam::volScalarField>("Ct")));
@@ -546,6 +586,8 @@ void SolidCloud::linkFluid(const Foam::volVectorField& U)
     const Foam::dictionary& transportProperties = mesh.lookupObject<Foam::IOdictionary>("transportProperties");
     const Foam::dimensionedScalar&      density = transportProperties.lookup("rho");
     m_rho = density.value();
+    if (!m_ON_FLUID)
+        m_rho = 0.0;
 
     // precalculate the mesh cell size field, must after creating solid cloud
     if(m_ON_TWOD)
@@ -563,9 +605,11 @@ void SolidCloud::linkFluid(const Foam::volVectorField& U)
         }
     }
 
-    // correct initial condtion to reduce the number of iteration at the 1st time step
+    // correct initial condition to reduce the number of iteration at the 1st time step
     if(!m_ON_RESTART)
+    {
         initialCorrect();
+    }
 }
 
 void SolidCloud::interact(const real& time, const real& dt)
@@ -578,11 +622,25 @@ void SolidCloud::interact(const real& time, const real& dt)
 
     (*m_ptr_Ts) = Foam::dimensionedScalar("zero", Foam::dimTemperature, 0.0);
 
+    //Foam::cpuTime exTime;
+    using namespace std::chrono;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
     for(Solid& solid : m_solids)
         solidFluidInteract(solid, dt);
 
     for(Solid& solid : m_planes)
         solidFluidInteract(solid, dt);
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> t_elapse = duration_cast<duration<double>>(t2 - t1);
+    
+    if(Foam::Pstream::master())
+    {
+        std::ostringstream msg;
+        msg << "t = " << std::setw(6) << time << " [FSI took " << std::left << std::setprecision(3) << std::setw(6) << 1000*t_elapse.count() << " ms]";
+        LOG(msg.str());
+    }
 
     m_ptr_As->correctBoundaryConditions();
     m_ptr_Fs->correctBoundaryConditions();
@@ -602,37 +660,52 @@ void SolidCloud::addMidEnvironment()
 
 void SolidCloud::solidSolidInteract()
 {
+    // solid versus solid
     m_ptr_ugrid->clear();
     for(const Solid& s : m_solids)
     {
-        label id = s.getID();
         vector center = s.getCenter();
-        m_ptr_ugrid->insert(center.x(), center.y(), center.z(), id);
+        m_ptr_ugrid->insert(center.x(), center.y(), center.z(), s.getID());
     }
-    std::vector<CollisionPair> pairs;
+    static std::vector<CollisionPair> pairs;
+    pairs.clear();
     m_ptr_ugrid->generateCollisionPairs(pairs);
-
     for(CollisionPair& pair : pairs)
+        solidSolidCollision(m_solids[pair.first], m_solids[pair.second]);
+
+    // plane versus solid
+    for(Solid& p: m_planes)
+        for(Solid& s: m_solids)
+            solidSolidCollision(p, s);
+}
+
+void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
+{
+    // geometric calculation
+    real cd; vector cP, cN; // geometric values to be calculated
+    collisionFunc cfunc = getCollisionFunc(s1.getShape()->getTypeName(), s2.getShape()->getTypeName());
+    if(!cfunc)
     {
-        // hardcoded parameters
-        static real crange = 0.01;
-        static real epsilon = 1.0e-5;
-        static real msg = 2.710932;
-
-        Solid& s1 = m_solids[pair.first];
-        Solid& s2 = m_solids[pair.second];
-
-        scalar c2c = Foam::mag(s1.getCenter() - s2.getCenter());
-        scalar contact_depth = (crange+s1.getShape()->getRadiusB()+s2.getShape()->getRadiusB()-c2c)/crange;
-
-        if(contact_depth < 0) continue;
-        vector contact_normal = Foam::normalised(s1.getCenter() - s2.getCenter());
-        vector force = msg/epsilon*contact_depth*contact_depth*contact_normal;
-        vector torque = vector::zero;
-
-        s1.addForceAndTorque( force, torque);
-        s2.addForceAndTorque(-force,-torque);
+        Foam::Info << "Collision between shape type " << s1.getShape()->getTypeName() << " and " << s2.getShape()->getTypeName() << " is not implemented!\n\n";
+        Quit("Error (feature not implemented)");
     }
+    cd = cfunc(s1, s2, cP, cN); 
+
+    vector force, torque;
+
+    /* force law: f = f(cd, cN, material) */
+    // option 1
+    {
+        if(cd < 0) return;
+        force  = 1e4*cd*cN;
+        torque = vector::zero;
+    }
+
+    // certainly many options exist, a place for user customization
+
+    // add to solids
+    s1.addForceAndTorque(-force,-torque);
+    s2.addForceAndTorque( force, torque);
 }
 
 void SolidCloud::evolve(const real& time, const real& dt)
@@ -747,53 +820,50 @@ void SolidCloud::saveState(const real& time)
 
 void SolidCloud::saveRestart(const std::string& filename)
 {
-    int ndigits = std::numeric_limits<real>::max_digits10;
-    std::ofstream fout(filename);
-    if(!fout.good()){
-        Quit("Can't open file " + filename + "\n!");
-    }
-    fout.precision(ndigits);
-    vector v;
-    for(Solid& solid : m_solids)
+    Foam::OFstream os(filename);
     {
-        v = solid.getCenter();  fout << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-        v = solid.getVelocity();fout << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-        v = solid.getForce();   fout << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
+        // update content to current time
+        dictionary &solids = m_solidDict.subDict("solids");
+        forAll(solids, i)
+        {
+            const Solid& s = m_solids[i]; // get solid from cloud
+            dictionary &solid = solids.subDict(solids.toc()[i]);
 
-        v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getOmega();   fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getFluidForce();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getFluidTorque();  fout << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+            // update kinematic data
+            vector tmp;
+
+            tmp = s.getCenter(); if(m_ON_TWOD) tmp.z() = 0.0;
+            solid.set("pos", tmp);
+            tmp = s.getVelocity(); if(m_ON_TWOD) tmp.z() = 0.0;
+            solid.set("vel", tmp);
+
+            solid.set("euler", s.getOrientation().eulerAngles(quaternion::XYZ)*180.0/M_PI); // convert to euler angles in degree
+            tmp = s.getOmega(); if(m_ON_TWOD) {tmp.x() = 0.0;tmp.y()=0.0;}
+            solid.set("omega", tmp);
+        }
     }
-
-    fout.close();
-}
-
-void SolidCloud::loadRestart(const std::string& filename)
-{
-    std::ifstream fin(filename, std::ifstream::in);
-    if(!fin.good()){
-        Quit("Can't open file " + filename + "\n!");
-    }
-
-    real x, y, z;
-    for(Solid& solid : m_solids)
-    {
-        fin >> x >> y >> z; solid.setCenter     (vector(x, y, z));
-        fin >> x >> y >> z; solid.setVelocity   (vector(x, y, z));
-        fin >> x >> y >> z; solid.setForce      (vector(x, y, z));
-        fin >> x >> y >> z; solid.setOrientation(vector(x, y, z));
-        fin >> x >> y >> z; solid.setOmega      (vector(x, y, z));
-        fin >> x >> y >> z; solid.setTorque     (vector(x, y, z));
-        fin >> x >> y >> z; solid.setFluidForceOld(vector(x, y, z));
-        fin >> x >> y >> z; solid.setFluidTorqueOld(vector(x, y, z));
-    }
-    fin.close();
+    os << "/*--------------------------------*- C++ -*----------------------------------*\\\n"
+ "| =========                 |                                                 |\n"
+ "| \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n"
+ "|  \\\\    /   O peration     | Version:  6.0.0                                 |\n"
+ "|   \\\\  /    A nd           | Web:      www.OpenFOAM.org                      |\n"
+ "|    \\\\/     M anipulation  |                                                 |\n"
+ "\\*---------------------------------------------------------------------------*/\n"
+ "FoamFile\n"
+ "{\n"
+ "    version     2.0;\n"
+ "    format      ascii;\n"
+ "    class       dictionary;\n"
+ "    object      solidDict;\n"
+ "}\n"
+ "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n";
+    m_solidDict.write(os, false);
+    os << "\n// " << Foam::word(GetTimeString()) << "\n"; // append the time stamp
 }
 
 const Solid& SolidCloud::operator[](label i) const
 {
     return m_solids[i];
+}
+
 }

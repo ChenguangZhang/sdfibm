@@ -3,10 +3,12 @@
 
 #include "../types.h"
 #include <algorithm>
+namespace sdfibm{
 
 #define SHAPETYPENAME(name) \
-    static string typeName() {return name;} \
-    static bool added;
+    static std::string typeName() {return name;} \
+    static bool added; \
+    virtual std::string getTypeName() const {return name;}
 
 class IShape;
 template <typename T>
@@ -23,16 +25,14 @@ class IShape
 {
 public:
     const static int m_id = -1;
-    real   m_radiusB; // radius of bounding sphere
+    real   m_radiusB;             // radius of bounding sphere
     real   m_volume, m_volumeINV; // volume
-    vector m_com; // center of mass
-    // moi always in principal frame (nonzero only along diagonal)
-    tensor m_moi, m_moiINV;
+    vector m_com;                 // center of mass
+    tensor m_moi, m_moiINV;       // moi must in principal frame (nonzero only along diagonal)
 
 public:
     IShape()
     {
-        // set default values
         m_radiusB   = 0.0; // bounding raidus
         m_volume    = 0.0; // volume
         m_volumeINV = 0.0; // 1/volume
@@ -42,10 +42,12 @@ public:
         m_moiINV = tensor(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    SHAPETYPENAME("IShape");
+
     virtual int  getShapeID() const {return m_id;}
     virtual real getRadiusB() const {return m_radiusB;}
 
-    // collection of inline sdf utilities, all are pure geometric functions
+    // collection of (inlined) sdf utility functions, purely geometric calculations
     // transformtion functions
     // because we are transforming the field, the points transformation are all "reversed"
     // for example rotate the field 30\degree counter-clockwise is equivalent to rotate the point 30\degree clockwise.
@@ -162,4 +164,5 @@ public:
     virtual ~IShape(){}
 };
 
+}
 #endif

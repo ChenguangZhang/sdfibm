@@ -7,6 +7,8 @@
 #include "dictionary.H"
 #include <string>
 
+namespace sdfibm{
+
 typedef double real;
 using std::string;
 using Foam::label;
@@ -16,4 +18,5 @@ using Foam::tensor;
 using Foam::quaternion;
 using Foam::dictionary;
 
+}
 #endif // TYPES_H

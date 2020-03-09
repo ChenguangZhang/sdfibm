@@ -73,3 +73,5 @@ solids
       euler (0.0 0.0 0.0);
     }
 }
+
+planes {}

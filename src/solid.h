@@ -2,12 +2,14 @@
 #define SOLID_H_INCLUDED
 
 #include "types.h"
-#include "./libshape/vof.h"
+//#include "./libshape/vof.h"
 #include "./libshape/ishape.h"
 #include "./libmotion/imotion.h"
 #include "./libmaterial/imaterial.h"
 #include "utils.h"
 #include "fvc.H"
+
+namespace sdfibm{
 
 class Solid
 {
@@ -192,4 +194,5 @@ public:
     ~Solid(){}
 };
 
+}
 #endif

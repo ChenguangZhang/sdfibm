@@ -9,14 +9,25 @@ int main(int argc, char *argv[])
     #include "createFields.h"
     #include "initContinuityErrs.H"
 
-    SolidCloud solidcloud;
+    std::string dictfile;
+    if(runTime.time().value() > 0)
+    {
+        // if start from a nonzero time, the time folder must contain a solidDict file
+        if(!Foam::Pstream::parRun())
+            dictfile = "./" + mesh.time().timeName() + "/solidDict";
+        else
+            // when parallel, all init from the master
+            dictfile = "./processor0/" + mesh.time().timeName() + "/solidDict";
+    }
+    else
+    {
+        dictfile = "solidDict";
+    }
+
+    sdfibm::SolidCloud solidcloud(dictfile);
 
     // link solid cloud with the fluid
-    solidcloud.linkMesh(mesh);
-    if(solidcloud.isOnFluid())
-    {
-        solidcloud.linkFluid(U);
-    }
+    solidcloud.linkFluid(U);
 
     while (runTime.loop())
     {
@@ -47,9 +58,12 @@ int main(int argc, char *argv[])
               + fvm::div(phi, T)
               ==fvm::laplacian(alpha, T));
             TEqn.solve();
+        }
 
-            // above is fluid-only, now account for solid effect
-            solidcloud.interact(runTime.value(), dt.value());
+        solidcloud.interact(runTime.value(), dt.value());
+
+        if(solidcloud.isOnFluid())
+        {
             U = U - Fs*dt;
 
             U.correctBoundaryConditions();
@@ -65,20 +79,21 @@ int main(int argc, char *argv[])
         solidcloud.evolve(runTime.value(), dt.value());
 
         if(solidcloud.isOnFluid())
+        {
             solidcloud.fixInternal();
+        }
 
         if(runTime.outputTime())
         {
-            // write flow fields
             runTime.write();
 
             if(Foam::Pstream::master())
             {
                 std::string file_name;
                 if(Foam::Pstream::parRun())
-                    file_name = "./processor0/" + runTime.timeName() + "/restart";
+                    file_name = "./processor0/" + runTime.timeName() + "/solidDict";
                 else
-                    file_name = "./" + runTime.timeName() + "/restart";
+                    file_name = "./" + runTime.timeName() + "/solidDict";
                 solidcloud.saveRestart(file_name);
             }
         }

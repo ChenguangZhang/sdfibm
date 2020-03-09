@@ -13,9 +13,13 @@
 #include "./libmaterial/imaterial.h"
 #include "utils.h"
 #include "meshSearch.H"
+#include "logger.h"
+
 
 #include "./libcollision/ugrid.h"
 #include "./libcollision/bbox.h"
+#include "./libcollision/collision.h"
+namespace sdfibm{
 
 class SolidCloud
 {
@@ -23,30 +27,27 @@ private:
     // control variables (note that solid is always on)
     bool m_ON_FLUID; // fluid is on by default, but could be disabled
     bool m_ON_TWOD;  // two dimensional
+    bool m_ON_VOFONLY;
     bool m_ON_RESTART;
 
 private:
     std::vector<Solid> m_solids; // finite solids
-    std::vector<Solid> m_planes; // infinite solids
+    std::vector<Solid> m_planes; // infinite planes (also solids)
+    dictionary m_solidDict;
 
-    // bind the correct 2D/3D function to process intersected cells
-    std::function<real (const IShape*,
-                        const vector&,
-                        const quaternion&,
-                        const Foam::scalarField&,
-                        const Foam::vectorField&,
-                        label)> m_vofCalculator;
+    // function binding of 2D or 3D geometric function to handle intersected cells
+    /* std::function<real (const IShape*, const vector&, const quaternion&, */
+    /*                     const Foam::scalarField&, const Foam::vectorField&, label)> m_vofCalculator; */
 
     // collision handling
-    std::vector<CollisionPair> collision_pairs;
-    UGrid* m_ptr_ugrid;
     BBox* m_ptr_bbox;
+    UGrid* m_ptr_ugrid;
+    std::vector<CollisionPair> collision_pairs;
+    real m_radiusB; // maximum bounding radius of shapes
 
-    // environments
-    vector m_gravity;
-    real   m_rho; // fluid density
-
-    real m_radiusB;
+    // environmental variables
+    vector m_gravity; // gravity
+    real   m_rho;     // fluid density
 
     // fluid
     Foam::fvMesh*         m_ptr_Mesh;
@@ -64,17 +65,16 @@ private:
 
 private:
     void solidSolidInteract();
+    void solidSolidCollision(Solid& s1, Solid& s2);
     void solidFluidInteract(Solid& s,  const real& dt);
 
-    //void resolveCollisionPairs();
+    void resolveCollisionPairs();
 
     std::map<std::string, IMotion*  > m_libmotion;
     std::map<std::string, IMaterial*> m_libmat;
     std::map<std::string, IShape*   > m_libshape;
     std::ofstream statefile;
-    std::ofstream logfile;
 
-    // helper functions to print info to the console
     inline const std::string GenBanner(const std::string& title) const
     {
         unsigned int nside = (78 - title.length())/2;
@@ -82,20 +82,19 @@ private:
     }
 
 public:
-    SolidCloud();
+    SolidCloud(const Foam::word& dictfile);
     ~SolidCloud();
 
     // related to initial setup
     inline void addSolid(const Solid& solid) { m_solids.push_back(solid); }
     inline void addPlane(const Solid& solid) { m_planes.push_back(solid); }
-    //void addBoundingBox(const BoundingBox& particle_bounding_box);
+    void addBoundingBox(const BBox& particle_bbox);
     void linkFluid(const Foam::volVectorField& U);
-    void linkMesh(const Foam::fvMesh& mesh);
     void initialCorrect();
 
     // io
     void saveState(const real& time);
-    void loadRestart(const std::string& filename);
+    void initFromDictionary(const Foam::word& dictname);// arg is dictionary name
     void saveRestart(const std::string& filename);
 
     const Solid& operator[](label i) const;
@@ -107,10 +106,12 @@ public:
     // related to time stepping
     void storeOld();
     void restoreOld();
-    void evolve  (const real& time, const real& dt); // returns the max change in cloud
+    void evolve  (const real& time, const real& dt);
     void interact(const real& time, const real& dt);
     void addMidEnvironment();
     void fixInternal();
 };
 
+}
 #endif
+

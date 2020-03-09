@@ -2,6 +2,7 @@
 #define MOTION01MASK_H
 
 #include "imotion.h"
+namespace sdfibm{
 
 class Motion01Mask:public IMotion, _creator<Motion01Mask>
 {
@@ -62,4 +63,5 @@ void Motion01Mask::constraint(const real &time, vector &velocity, vector &omega)
     omega    = cmptMultiply(omega, omask);
 }
 
+}
 #endif // MOTION01MASK

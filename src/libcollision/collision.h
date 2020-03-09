@@ -1,24 +1,32 @@
 #ifndef COLLISION_HPP
 #define COLLISION_HPP
 
-#include "types.hpp"
-#include "utilsccd.hpp"
-#include "utils.hpp"
-#include "solid.hpp"
-#include "../shapelib/shapes.hpp"
+#include "../types.h"
+#include "../utils.h"
+#include "../solid.h"
+#include <map>
+namespace sdfibm{
 
-real circleCircleCollision(Solid& c1, Solid& c2, vector& collision_location, vector& collision_direction);
-real circlePlaneCollision (Solid& c,  Solid& p,  vector& collision_location, vector& collision_direction);
-real spherePlaneCollision (Solid& c,  Solid& p,  vector& collision_location, vector& collision_direction);
-real ellipsePlaneCollision(Solid& c,  Solid& p,  vector& collision_location, vector& collision_direction);
-real sphereSphereCollision(Solid& c1,  Solid& c2,  vector& collision_location, vector& collision_direction);
+const int kNUM_COL_FUNC = 10;
+static std::map<std::string, int> SHAPE2ID = {
+    {"Plane",  0},
+    {"Circle", 1},
+    {"Sphere", 2}
+};
 
-extern real (*collisionFunctionTable[10][10])(
-           Solid& s1,
-           Solid& s2,
-           vector& contact_location,
-           vector& contact_normal
-        );
+// 2d collision
+real circlePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
+real circleCircleCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
 
-void collisionFunctionTableInit();
+// 3d collision
+real spherePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
+real sphereSphereCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
+
+typedef real (*collisionFunc)(const Solid& s1, const Solid& s2, vector& cP, vector& cN);
+extern collisionFunc collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC]; // table of collsion handling functions
+// extern real (*collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC])(Solid& s1, Solid& s2, vector& cP, vector& cN);
+void InitCollisionFuncTable();
+collisionFunc getCollisionFunc(const std::string& name1, const std::string& name2);
+
+}
 #endif // COLLISION_HPP

@@ -2,6 +2,7 @@
 #define MOTION000111_H
 
 #include "imotion.h"
+namespace sdfibm{
 
 class Motion000111:public IMotion, _creator<Motion000111>
 {
@@ -24,4 +25,5 @@ void Motion000111::constraint(const real &time, vector &velocity, vector &omega)
     velocity = vector::zero;
 }
 
+}
 #endif // MOTION000111_H

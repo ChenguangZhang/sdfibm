@@ -3,8 +3,8 @@
 
 #include "../types.h"
 
-// nameing convention
-// a famliy of motions, 0 means killed, 1 means totally free, 2 means value specified
+namespace sdfibm{
+// nameing convention: 0 completely frozen, 1 totally free, 2 user specified
 
 #define TYPENAME(name) \
     static std::string typeName() {return name;} \
@@ -35,4 +35,5 @@ public:
     virtual std::string description() const = 0; // more detailed information
 };
 
+}
 #endif

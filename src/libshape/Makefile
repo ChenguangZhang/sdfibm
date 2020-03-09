@@ -20,7 +20,7 @@ LIBMPI=$(FOAM_LIBBIN)/openmpi-system/libPstream.so
 LDFLAGS =-lm
 LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -L$(EXTDIR) -lyaml-cpp
 
-LIBSOURCES= vof.cpp shapefactory.cpp
+LIBSOURCES= shapefactory.cpp
 LIBOBJECTS=$(LIBSOURCES:.cpp=.o)
 
 

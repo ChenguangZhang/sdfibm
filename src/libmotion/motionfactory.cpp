@@ -2,9 +2,10 @@
 #include "motionfactory.h"
 
 #include <iostream>
+namespace sdfibm{
 
 #define REGISTERMOTION(m) \
-    bool m::added = MotionFactory::add(m::typeName(), m::create);
+    bool sdfibm::m::added = MotionFactory::add(sdfibm::m::typeName(), sdfibm::m::create);
 
 bool MotionFactory::add(const string& name, TCreateMethod create_method)
 {
@@ -30,6 +31,7 @@ IMotion* MotionFactory::create(const string& name, const dictionary& node)
 
 std::map<string, MotionFactory::TCreateMethod> MotionFactory::m_methods;
 
+}
 // add motions
 #include "motion000000.h"
 REGISTERMOTION(Motion000000);
@@ -49,13 +51,12 @@ REGISTERMOTION(Motion111111);
 REGISTERMOTION(Motion222000);
 #include "motionsinedirectional.h"
 REGISTERMOTION(MotionSineDirectional);
-
-#include      "motion001001.h"
+#include "motion001001.h"
 REGISTERMOTION(Motion001001);
-#include      "motion010010.h"
+#include "motion010010.h"
 REGISTERMOTION(Motion010010);
-#include      "motion100100.h"
+#include "motion100100.h"
 REGISTERMOTION(Motion100100);
-
-#include      "motion01mask.h"
+#include "motion01mask.h"
 REGISTERMOTION(Motion01Mask);
+
