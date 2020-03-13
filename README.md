@@ -35,10 +35,16 @@ Cases under the [example](./examples) folder are some good starting points of us
 ![Re200](./figs/flow_past_cylinder_re200.gif)
 
 - the Taylor-Couette flow with a rotational core. A MATLAB finite-difference script is also there, which solves a reduced-order PDE that validates sdfibm
-- an ellipse that wobbles and settles in a rectangular container
-- under `./examples\sedimentation` is a case where 100 circular particles settle in a square container. The particle trajectories plotted below clearly show the circulation caused by the counter flow. An animation is available at https://www.youtube.com/watch?v=C6U9X9zatz8.
 
-![Re200](./figs/traj.svg)
+- an ellipse that wobbles and settles in a rectangular container
+
+- `./examples\sedimentation` is a case where 100 circular particles settle in a square container (a video version you can pause is here https://www.youtube.com/watch?v=C6U9X9zatz8). 
+
+  ![trajectories](./figs/ani_T.gif)
+
+  The particle trajectories below clearly show the circulation caused by the counter flow.
+
+  ![trajectories](./figs/traj.svg)
 
 Lastly, not directly related with immersed boundary method, a tool is created to smoothly initialize the phase field of VOF simulations. The word "smooth" here is essential when simulating low Capillary number flows. The simplest method (as used by `setFields`) that simply sets the phase fraction at mesh cells to 0/1 creates a zigzag phase interface, which generates capillary waves that pollute the simulation easily. My tool initializes the VOF phase field accurately and smoothly. The image below is the initialized field of the (2D) `./tool_vof/example` case, which shows
 
