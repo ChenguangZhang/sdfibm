@@ -36,29 +36,22 @@ shapes
     }
     shape3
     {
+        name             ellipse1;
+        type             Ellipse;
+        radiusa          0.3;
+        radiusb          0.2;
+    }
+    shape4
+    {
+        name             rectangle1;
+        type             Rectangle;
+        radiusa          0.3;
+        radiusb          0.2;
+    }
+    shape5
+    {
         name            plane1;
         type            Plane;
-    }
-}
-
-materials
-{
-    material1
-    {
-        name            mat1;
-        type            General;
-        rho             2;
-        rn              0.9;
-        rt              0.9;
-    }
-}
-
-motions
-{
-    motion1
-    {
-        name            free1;
-        type            Motion111111;
     }
 }
 
@@ -66,123 +59,75 @@ solids
 {
     solid1
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        circle_tail1;
         pos             ( 0.5 1.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 34 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 -45);
     }
     solid2
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        circle_tail1;
         pos             ( 0.5 2.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 0);
     }
     solid3
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        circle_tail1;
         pos             ( 0.5 3.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 45);
     }
     solid4
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        rectangle1;
         pos             ( 1.5 1.5 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
     }
     solid5
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        rectangle1;
         pos             ( 1.5 2.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 30);
     }
     solid6
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        rectangle1;
         pos             ( 1.5 3.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 60);
     }
     solid7
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        ellipse1;
         pos             ( 2.5 1.5 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
     }
     solid8
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        ellipse1;
         pos             ( 2.5 2.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 60);
     }
     solid9
     {
-        shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
+        shp_name        ellipse1;
         pos             ( 2.5 3.5 0 );
-        vel             ( 0 0 0 );
-        euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
+        euler           ( 0 0 120);
     }
     solid10
     {
         shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
-        pos             ( 3.5 1.5 0 );
-        vel             ( 0 0 0 );
+        pos             ( 3.5 1.0 0 );
         euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
     }
     solid11
     {
         shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
         pos             ( 3.5 2.5 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
     }
     solid12
     {
         shp_name        circle1;
-        mot_name        free1;
-        mat_name        mat1;
         pos             ( 3.5 3.5 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 0 );
-        omega           ( 0 0 0 );
     }
 }
 
@@ -191,19 +136,13 @@ planes
     plane1
     {
         shp_name        plane1;
-        mot_name        static;
-        mat_name        mat1;
         pos             ( 0 0 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 15 );
     }
     plane2
     {
         shp_name        plane1;
-        mot_name        static;
-        mat_name        mat1;
         pos             ( 0 0 0 );
-        vel             ( 0 0 0 );
         euler           ( 0 0 -90 );
     }
 }

@@ -35,10 +35,7 @@ private:
 
     // fluid
     Foam::fvMesh*         m_ptr_Mesh;
-
-    Foam::scalarField* m_ptr_cs; // cell size
     Foam::volScalarField* m_ptr_ct; // cell type
-    // solid's projected fields on fluid mesh
     Foam::volScalarField* m_ptr_As;
     Foam::meshSearch* m_ms;
 
@@ -61,24 +58,13 @@ private:
 
 public:
     SolidCloud();
-    ~SolidCloud();
+    ~SolidCloud(){};
 
     // related to initial setup
     inline void addSolid(const Solid& solid) { m_solids.push_back(solid); }
     inline void addPlane(const Solid& solid) { m_planes.push_back(solid); }
-    void addBoundingBox(const BBox& particle_bbox);
-    void linkFluid(const Foam::volScalarField& U);
-    void initialCorrect();
-
+    void writeVOF(const Foam::fvMesh& mesh);
     void setFieldName(const std::string& field_name){m_field_name = field_name;}
-
-    const Solid& operator[](label i) const;
-    void checkAlpha() const;
-    real totalSolidVolume() const;
-    bool inline isOnTwoD() const  {return m_ON_TWOD;}
-
-    // related to time stepping
-    void interact(const real& time, const real& dt);
 };
 
 }

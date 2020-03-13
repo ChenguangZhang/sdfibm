@@ -40,9 +40,16 @@ Cases under the [example](./examples) folder are some good starting points of us
 
 ![Re200](./figs/traj.svg)
 
-Lastly, not directly related with immersed boundary method, a tool is created to smoothly initialize the phase field of VoF simulations. The word "smooth" here is essential when simulating low Capillary number flows. If the naive method that simply sets the phase fraction at mesh cells to 0/1 is used, a zigzag phase interface is created, which causes capillary waves that pollute the simulation easily. My tool initializes VoF phase field accurately and smoothly (image below is from the `./tool_vof/example` case).
+Lastly, not directly related with immersed boundary method, a tool is created to smoothly initialize the phase field of VOF simulations. The word "smooth" here is essential when simulating low Capillary number flows. The simplest method (as used by `setFields`) that simply sets the phase fraction at mesh cells to 0/1 creates a zigzag phase interface, which generates capillary waves that pollute the simulation easily. My tool initializes the VOF phase field accurately and smoothly. The image below is the initialized field of the (2D) `./tool_vof/example` case, which shows
 
-![Re200](./figs/vof.png)
+1. the various shapes can be used
+2. the shapes can overlap each other (see lower right corner)
+
+![vof](./figs/vof.png)
+
+The case is setup for `interFoam`, which can be called right after initialization. The result is below. As expected, the droplet oscillations are smooth without anything spurious.
+
+![vof](./figs/vof_ani.gif)
 
 # Code files
 

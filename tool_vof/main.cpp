@@ -23,16 +23,14 @@ int main(int argc, char *argv[])
     else
         args.optionReadIfPresent("name", field_name);
 
-    volScalarField As (IOobject (field_name, runTime.timeName(), mesh, IOobject::MUST_READ, IOobject::AUTO_WRITE ), mesh);
-    volScalarField Ct (IOobject ( "Ct", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE ), mesh, dimensionedScalar("Ct", dimless, 0.0), zeroGradientFvPatchScalarField::typeName);
-    surfaceScalarField phi(IOobject ( "phi", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE ), mesh,
-                dimensionedScalar("tmp", dimless, 0.0), "calculated" );
+    volScalarField      As(IOobject(field_name, runTime.timeName(), mesh, IOobject::MUST_READ, IOobject::AUTO_WRITE), mesh);
+    volScalarField      Ct(IOobject(      "Ct", runTime.timeName(), mesh, IOobject::NO_READ,   IOobject::NO_WRITE  ), mesh, dimensionedScalar("Ct",  dimless, 0.0), zeroGradientFvPatchScalarField::typeName);
+    surfaceScalarField phi(IOobject(     "phi", runTime.timeName(), mesh, IOobject::NO_READ,   IOobject::NO_WRITE  ), mesh, dimensionedScalar("tmp", dimless, 0.0), "calculated");
 
     sdfibm::SolidCloud solidcloud;
     solidcloud.setFieldName(field_name);
 
-    solidcloud.linkFluid(As);
+    solidcloud.writeVOF(mesh);
 
-    Foam::Info << "Smoothly initializd field [" << field_name << "]\n";
     return 0;
 }
