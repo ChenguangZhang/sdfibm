@@ -57,6 +57,10 @@ The case is setup for `interFoam`, which can be called right after initializatio
 
 ![vof](./figs/vof_ani.gif)
 
+The animation below shows oscillations of two inviscid 2D elliptical droplets (period $T=1$), the left one was initialized using our VOF tool, the right one used `setFields` of OpenFOAM. The spurious capillary waves caused by the zig-zag boundary in the right droplet is clearly visible. Even those waves appear diminished later on, they are hard to control and separate from the physical results. Thus, the left simulation with smooth initialization is strongly preferred.
+
+![vof_comp](./figs/smooth_vs_rough.gif)
+
 # Code files
 
 - `libshape` contains shape definitions using SDF
