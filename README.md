@@ -46,18 +46,20 @@ Cases under the [example](./examples) folder are some good starting points of us
 
   ![trajectories](./figs/traj.svg)
 
-Lastly, not directly related with immersed boundary method, a tool is created to smoothly initialize the phase field of VOF simulations. The word "smooth" here is essential when simulating low Capillary number flows. The simplest method (as used by `setFields`) that simply sets the phase fraction at mesh cells to 0/1 creates a zigzag phase interface, which generates capillary waves that pollute the simulation easily. My tool initializes the VOF phase field accurately and smoothly. The image below is the initialized field of the (2D) `./tool_vof/example` case, which shows
+# Smooth VOF Initialization
+
+Not directly related with immersed boundary method, a tool is created to smoothly initialize the phase field of VOF simulations. The word "smooth" here is essential when simulating low Capillary number flows. The simplest method (as used by `setFields`) that simply sets the phase fraction at mesh cells to 0/1 creates a staircase phase interface, which generates capillary waves that pollute the simulation easily. My tool initializes the VOF phase field accurately and smoothly. The image below is the initialized field of the (2D) `./tool_vof/example` case, which shows
 
 1. the various shapes can be used
-2. the shapes can overlap each other (see lower right corner)
+2. the shapes can overlap each other (see lower right)
 
 ![vof](./figs/vof.png)
 
-The case is setup for `interFoam`, which can be called right after initialization. The result is below. As expected, the droplet oscillations are smooth without anything spurious.
+The case is ready for `interFoam` and can be run right after initialization. The result is below. As expected, the droplet oscillations are smooth without anything spurious.
 
 ![vof](./figs/vof_ani.gif)
 
-The animation below shows oscillations of two inviscid 2D elliptical droplets (period $T=1$), the left one was initialized using our VOF tool, the right one used `setFields` of OpenFOAM. The spurious capillary waves caused by the zig-zag boundary in the right droplet is clearly visible. Even those waves appear diminished later on, they are hard to control and separate from the physical results. Thus, the left simulation with smooth initialization is strongly preferred.
+The animation below compares smooth (left) vs. staircase (right) initializations, using the oscillation of inviscid 2D elliptical droplets ($T=1$). The left one used our VOF tool, the right one used `setFields` of OpenFOAM---there the spurious capillary waves caused by the staircase boundary are clearly visible. Even those waves appear diminished later on, they are hard to control or separate from the physical results. Thus, the left simulation is strongly preferred.
 
 ![vof_comp](./figs/smooth_vs_rough.gif)
 
@@ -87,10 +89,12 @@ In words, they are:
 > Time, position-x, position-x, position-z, velocity-x, velocity-y, velocity-z, force-x, force-y, force-z, Euler_angle-x, Euler_angle-y, Euler_angle-z, angular_velocity-x, angular_velocity-y, angular_velocity-z, torque-x, torque-y, torque-z
 
 
-# How to Cite
+# How to cite
 Please cite the following paper if you use this code.
 
 Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric algorithms for immersed boundary method using signed distance field. Journal of Fluids Engineering, 141(6):061401, 2019.
+
+Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Submitted to Computer Physics Communications (under review, wait for update).
 
 # Misc.
 
