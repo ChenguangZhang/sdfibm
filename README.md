@@ -24,7 +24,9 @@ will make the binary accessible system wide, and you can then type `sdfibm` to r
 
 ## Important!
 
-A 2D simulation in OpenFOAM really uses a one-cell thick 3D mesh, sdfibm requires the "thickness direction" to be $z$. In addition, the $z$-span of the mesh must be $[-0.5,0.5]$. In other words, the dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. 
+- Our convention of coordinate system is $x$-$y$ plane is the picture in front of us, and $z$-axis points at us.
+
+- A 2D simulation in OpenFOAM really uses a one-cell thick 3D mesh, `sdfibm` requires the "thickness direction" to be $z$. In addition, the $z$-span of the mesh must be $[-0.5,0.5]$. In other words, the dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. 
 
 
 # Included examples
@@ -45,6 +47,14 @@ Cases under the [example](./examples) folder are some good starting points of us
   The particle trajectories below clearly show the circulation caused by the counter flow.
 
   ![trajectories](./figs/traj.svg)
+
+## Creating planes
+
+The plane definition (e.g., in the sedimentation case) can be a bit confusing, especially its orientation. We know a plane is specified by an on-plane point $\boldsymbol p$ (`pos` below) and a direction $\boldsymbol n$.  $\boldsymbol p$ does not matter much as long as it's on the plane. Regarding $\boldsymbol n$, our convention is that **it points into the fluid**. By default (i.e., no rotation or translation), the plane is the $x$-$z$  plane (like the flat ground), with $\boldsymbol n$ pointing upward, so fluid is above the plane. 
+
+If we want to make a left wall---meaning the fluid is to its right---then $\boldsymbol n$ must be point rightwards, which in turn means we need to rotate the plane clockwise 90 &deg, or -90 &deg (I believe everybody agrees that clockwise rotation has a negative angle). Similarly, to make a right wall we have to rotate it positive 90 &deg. Lastly, if the left wall is at, say, $x=-10%$, you also need to set the `pos` variable to $(-10, y, z)$. Remember, the only requirement of `pos` is that it is on the plane, so $y$ and $z$ values do not really matter here. 
+
+![planes](./figs/planes.png)
 
 # Smooth VOF Initialization
 
@@ -99,3 +109,5 @@ Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed
 # Misc.
 
 I prefer 🍔 to coffee if you want to brighten my day :) [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=BWVSQXJKTRGSJ&currency_code=USD&source=url)
+
+To check the version of your `sdfibm` repository, use `git log -1`. The minus one means the latest commit.
