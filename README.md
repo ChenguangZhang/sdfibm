@@ -73,6 +73,10 @@ The animation below compares smooth (left) vs. staircase (right) initializations
 
 ![vof_comp](./figs/smooth_vs_rough.gif)
 
+Lastly, the tool works with arbitrary polyhedron meshes, see figure below (left: current too, right: `setFields`, contoured value: 0.5).
+
+![init_on_poly](./figs/init_on_poly.png)
+
 # Code files
 
 - `libshape` contains shape definitions using SDF
