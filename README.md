@@ -1,32 +1,26 @@
 # sdfibm
-An implementation of immersed boundary method in OpenFOAM v6 for simulating fluid-solid interaction and particle-laden multiphase flows. Licensed under [GPLv3](https://opensource.org/licenses/GPL-3.0).
+An immersed boundary method for simulating fluid-solid interaction and particle-laden multiphase flows.
 
 -----------
 
 # Installation
-Requirement: `g++` with `C++11` support and OpenFOAM v6. Other compilers haven't been tested but mostly likely they work just fine.
+Requirement: `g++` with `C++11` support and OpenFOAM v6. Other compilers weren't tested but should work.
 
-## Step 1 OpenFOAM
-Following the official [installation guide](https://www.openfoam.org), also please test afterwards by running some serial and parallel tutorial cases to ensure a working installation.
+*Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM v6. Test afterwards to ensure a working installation (e.g., by running some serial and parallel tutorial cases).
 
-## Step 2 Compilation
-Whether you are using your personal computer or using HPC, simply type the following three commands:
+*Step 2*, whether on your laptop or HPC cluster, simply type three commands.
+
 ```bash
 git clone https://github.com/ChenguangZhang/sdfibm.git
 cd sdfibm/src
 make
 ```
-The solver binary is `./src/sdfibm`. You can soft-link it to your desire location as needed. For example, if the repo is cloned under home directory, then after compilation the command
-```
-sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm
-```
-will make the binary accessible system wide, and you can then type `sdfibm` to run a simulation without specifying the whole binary path every time.
-
+The solver binary is `./src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm`), then you can simply type `sdfibm` to run a simulation without specifying the whole binary path.
 ## Important!
 
-- Our convention of coordinate system is $x$-$y$ plane is the picture in front of us, and $z$-axis points at us.
+- The convention of coordinate system is that we face the $x$-$y$ plane, with $z$-axis pointing towards us.
 
-- A 2D simulation in OpenFOAM really uses a one-cell thick 3D mesh, `sdfibm` requires the "thickness direction" to be $z$. In addition, the $z$-span of the mesh must be $[-0.5,0.5]$. In other words, the dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. 
+- A 2D simulation uses a one-cell-thick 3D mesh, `sdfibm` mandates that the "thickness direction" is in $z$ and the $z$-span of the mesh is $[-0.5,0.5]$. In other words, the 2D dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. 
 
 
 # Included examples
@@ -95,7 +89,7 @@ Lastly, the tool works with arbitrary polyhedron meshes, see figure below (left:
 - `main.cpp` implements the projection method and the direct forcing IBM
 
 # Output file
-Information of the solid bodies is written to the `cloud.out` file, which has the simplest possible format: if there are $m$ solids and $n$ planes, each time step sdfibm writes $m+n$ lines, and each line contains 19 columns.
+Information of the solid bodies is written to the `cloud.out` file, which has the simple plain text format: if there are $m$ solids and $n$ planes, each time step `sdfibm` writes $m+n$ lines, and each line contains 19 columns.
 
 > names = ["t", "x", "y", "z", "vx", "vy", "vz", "fx", "fy", "fz", "EulerAx", "EulerAy", "EulerAz", "wx", "wy", "wz", "Tx", "Ty", "Tz"]
 
@@ -104,11 +98,17 @@ In words, they are:
 
 
 # How to cite
-Please cite the following paper if you use this code.
+Cite the following papers if you use this code.
 
-Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric algorithms for immersed boundary method using signed distance field. Journal of Fluids Engineering, 141(6):061401, 2019.
+1. Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric algorithms for immersed boundary method using signed distance field. Journal of Fluids Engineering, 141(6):061401, 2019.
 
-Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Submitted to Computer Physics Communications (under review, wait for update).
+2. Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Submitted to Computer Physics Communications (under review, wait for update).
+
+# License 
+
+`sdfibm` is licensed under GNU GENERAL PUBLIC LICENSE ([GPLv3](https://opensource.org/licenses/GPL-3.0)). You can use, copy and modify `sdfibm` freely. If you distribute your software based on (any part of) `sdfibm`, you are obliged to distribute the source code of your software under GPL, in addition to any modifications made to `sdfibm`.
+
+In case the constraints prevent you from using `sdfibm`, you can obtain a commercial license by contacting me.
 
 # Misc.
 
