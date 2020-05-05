@@ -102,7 +102,7 @@ Cite the following papers if you use this code.
 
 1. Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric algorithms for immersed boundary method using signed distance field. Journal of Fluids Engineering, 141(6):061401, 2019.
 
-2. Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Submitted to Computer Physics Communications (under review, wait for update).
+2. Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Computer Physics Communications (accepted 2020).
 
 # License 
 
