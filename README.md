@@ -20,7 +20,7 @@ The solver binary is `./src/sdfibm`. It is recommended that you soft-link it to 
 
 - The convention of coordinate system is that we face the $x$-$y$ plane, with $z$-axis pointing towards us.
 
-- A 2D simulation uses a one-cell-thick 3D mesh, `sdfibm` mandates that the "thickness direction" is in $z$ and the $z$-span of the mesh is $[-0.5,0.5]$. In other words, the 2D dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. 
+- A 2D simulation uses a one-cell-thick 3D mesh, `sdfibm` mandates that the "thickness direction" is in $z$ and the $z$-span of the mesh is $[-0.5,0.5]$. In other words, the 2D dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. In addition, due to the different ways of handling the geometry, the `on_twod` option in `solidDict` must be set to 1.
 
 
 # Included examples
@@ -102,7 +102,7 @@ Cite the following papers if you use this code.
 
 1. Chenguang Zhang, Chunliang Wu, and Krishnaswamy Nandakumar. Effective geometric algorithms for immersed boundary method using signed distance field. Journal of Fluids Engineering, 141(6):061401, 2019.
 
-2. Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Submitted to Computer Physics Communications (under review, wait for update).
+2. Chenguang Zhang. sdfibm: a Signed Distance Field Based Discrete Forcing Immersed Boundary Method in OpenFOAM. Computer Physics Communications (accepted 2020).
 
 # License 
 
