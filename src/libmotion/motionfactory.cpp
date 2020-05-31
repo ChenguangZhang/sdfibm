@@ -45,6 +45,8 @@ REGISTERMOTION(Motion000001);
 REGISTERMOTION(Motion000111);
 #include "motion000002.h"
 REGISTERMOTION(Motion000002);
+#include "motion110002.h"
+REGISTERMOTION(Motion110002);
 #include "motion111111.h"
 REGISTERMOTION(Motion111111);
 #include "motion222000.h"
@@ -59,4 +61,6 @@ REGISTERMOTION(Motion010010);
 REGISTERMOTION(Motion100100);
 #include "motion01mask.h"
 REGISTERMOTION(Motion01Mask);
+#include "motionrotor.h"
+REGISTERMOTION(MotionRotor);
 
