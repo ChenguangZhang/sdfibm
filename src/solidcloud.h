@@ -5,111 +5,102 @@
 #include <map>
 #include <iostream>
 #include <fstream>
-#include <functional>
 
 #include "fvm.H"
 #include "types.h"
 #include "solid.h"
 #include "./libmaterial/imaterial.h"
 #include "utils.h"
-#include "meshSearch.H"
 #include "logger.h"
-
+#include "geometrictools.h"
 
 #include "./libcollision/ugrid.h"
 #include "./libcollision/bbox.h"
 #include "./libcollision/collision.h"
-namespace sdfibm{
+#include "cellenumerator.h"
+
+namespace sdfibm {
+
+class GeometricTools;
 
 class SolidCloud
 {
 private:
-    // control variables (note that solid is always on)
-    bool m_ON_FLUID; // fluid is on by default, but could be disabled
-    bool m_ON_TWOD;  // two dimensional
+    bool m_ON_FLUID; // is fsi?
+    bool m_ON_TWOD;  // is 2-d?
     bool m_ON_VOFONLY;
     bool m_ON_RESTART;
+    SolidCloud (const SolidCloud&) = delete;
+    SolidCloud& operator=(const SolidCloud&) = delete;
 
 private:
     std::vector<Solid> m_solids; // finite solids
     std::vector<Solid> m_planes; // infinite planes (also solids)
     dictionary m_solidDict;
 
-    // function binding of 2D or 3D geometric function to handle intersected cells
-    /* std::function<real (const IShape*, const vector&, const quaternion&, */
-    /*                     const Foam::scalarField&, const Foam::vectorField&, label)> m_vofCalculator; */
-
     // collision handling
     BBox* m_ptr_bbox;
     UGrid* m_ptr_ugrid;
     std::vector<CollisionPair> collision_pairs;
-    real m_radiusB; // maximum bounding radius of shapes
+    scalar m_radiusB; // max bounding radius of shapes
 
-    // environmental variables
-    vector m_gravity; // gravity
-    real   m_rho;     // fluid density
+    // environmental info
+    vector m_gravity;
+    scalar m_rhof; // fluid density
 
-    // fluid
-    Foam::fvMesh*         m_ptr_Mesh;
-    Foam::volVectorField* m_ptr_Uf;
+    // variables on mesh
+    const Foam::fvMesh&   m_mesh;
+    Foam::volVectorField& m_Uf;
+    Foam::volScalarField& m_ct;
+    Foam::volScalarField& m_As;
+    Foam::volVectorField& m_Fs;
+    Foam::volScalarField& m_Ts;
 
-    Foam::scalarField* m_ptr_cs; // cell size
-    Foam::volScalarField* m_ptr_ct; // cell type
-    // solid's projected fields on fluid mesh
-    Foam::volScalarField* m_ptr_As;
-    Foam::volVectorField* m_ptr_Fs;
-    Foam::volScalarField* m_ptr_Ts;
-
-    Foam::surfaceScalarField* m_ptr_Asf;
-    Foam::meshSearch* m_ms;
-
-private:
-    void solidSolidInteract();
-    void solidSolidCollision(Solid& s1, Solid& s2);
-    void solidFluidInteract(Solid& s,  const real& dt);
-
-    void resolveCollisionPairs();
+    GeometricTools m_geotools;
+    CellEnumerator cellenum;
 
     std::map<std::string, IMotion*  > m_libmotion;
     std::map<std::string, IMaterial*> m_libmat;
     std::map<std::string, IShape*   > m_libshape;
     std::ofstream statefile;
 
-    inline const std::string GenBanner(const std::string& title) const
-    {
-        unsigned int nside = (78 - title.length())/2;
-        return std::string(nside, '*') + ' ' + title +  ' ' + std::string(nside, '*') + '\n';
-    }
+private:
+    void solidSolidInteract();
+    void solidSolidCollision(Solid& s1, Solid& s2);
+    void resolveCollisionPairs();
+
+    void solidFluidInteract(Solid& s,  const scalar& dt);
+    void solidFluidCorrect(Solid& s, const scalar& dt);
 
 public:
-    SolidCloud(const Foam::word& dictfile);
+    SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U);
     ~SolidCloud();
 
-    // related to initial setup
+    // setup
     inline void addSolid(const Solid& solid) { m_solids.push_back(solid); }
     inline void addPlane(const Solid& solid) { m_planes.push_back(solid); }
     void addBoundingBox(const BBox& particle_bbox);
-    void linkFluid(const Foam::volVectorField& U);
-    void initialCorrect();
 
     // io
-    void saveState(const real& time);
-    void initFromDictionary(const Foam::word& dictname);// arg is dictionary name
+    void saveState(const scalar& time);
+    void initFromDictionary(const Foam::word& dictname);
     void saveRestart(const std::string& filename);
-
     const Solid& operator[](label i) const;
+
+    // info
     void checkAlpha() const;
-    real totalSolidVolume() const;
+    scalar totalSolidVolume() const;
     bool inline isOnFluid() const {return m_ON_FLUID;}
     bool inline isOnTwoD() const  {return m_ON_TWOD;}
 
-    // related to time stepping
+    // time stepping
     void storeOld();
     void restoreOld();
-    void evolve  (const real& time, const real& dt);
-    void interact(const real& time, const real& dt);
+    void evolve  (const scalar& time, const scalar& dt);
+    void interact(const scalar& time, const scalar& dt);
     void addMidEnvironment();
-    void fixInternal();
+    void fixInternal(const scalar& dt);
+    void initialCorrect();
 };
 
 }

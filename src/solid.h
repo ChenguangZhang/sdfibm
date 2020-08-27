@@ -9,13 +9,13 @@
 #include "utils.h"
 #include "fvc.H"
 
-namespace sdfibm{
+namespace sdfibm {
 
 class Solid
 {
 protected:
-    label id;     // integer labels starting from 0
-    label cellid; // id of the mesh cell that host the solid center
+    label id;     // integer label
+    label hostid; // id of the mesh cell that host the solid center
 
     // state
     vector center;
@@ -43,8 +43,8 @@ protected:
     IMaterial* ptr_material;
 
     // object properties = shape x material
-    real mass;
-    real mass_inv;
+    scalar mass;
+    scalar mass_inv;
     tensor moi_inv;
 
 public:
@@ -77,7 +77,7 @@ public:
     inline IMotion*   getMotion()   const {return ptr_motion;  }
     inline IShape*    getShape()    const {return ptr_shape;   }
     inline IMaterial* getMaterial() const {return ptr_material;}
-    inline real       getRadiusB()  const {return ptr_shape->getRadiusB();}
+    inline scalar     getRadiusB()  const {return ptr_shape->getRadiusB();}
 
     // done getters and setters
     // set solid material and shape
@@ -88,7 +88,7 @@ public:
         ptr_shape    = shape;
 
         // update composite properties
-        real rho = ptr_material->getRho();
+        scalar rho = ptr_material->getRho();
         mass     = ptr_shape->m_volume    * rho;
         mass_inv = ptr_shape->m_volumeINV / rho;
         moi_inv  = ptr_shape->m_moiINV    / rho;
@@ -103,7 +103,7 @@ public:
     {
         return ptr_shape->isInside(point, center, orientation);
     }
-    inline real signedDistance(const vector& point) const
+    inline scalar signedDistance(const vector& point) const
     {
         return ptr_shape->signedDistance(point, center, orientation);
     }
@@ -112,7 +112,6 @@ public:
         return velocity + (omega^(p - center));
     }
 
-    /// kinematics
     inline void addAcceleration(const vector& acc)
     {
         // dedicated to body force which needs the (priviate) mass info
@@ -144,7 +143,7 @@ public:
         torque += external_torque;
     }
 
-    void move(const real& time, const real& dt)
+    void move(const scalar& time, const scalar& dt)
     {
         // motion = velocity & omega
         // temporarily store motion at time n
@@ -189,6 +188,7 @@ public:
         ptr_material = nullptr;
         mass = 0;
         mass_inv = 0;
+        hostid =-1;
     }
 
     ~Solid(){}
