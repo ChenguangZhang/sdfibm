@@ -2,7 +2,7 @@
 #include <iostream>
 namespace sdfibm{
 
-UGrid::UGrid(BBox& bbox, double delta)
+UGrid::UGrid(BBox& bbox, scalar delta)
 {
    m_bbox  = bbox;
    m_delta = delta;

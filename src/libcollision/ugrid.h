@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "bbox.h"
+#include "../types.h"
 typedef std::pair<int, int> CollisionPair;
 
 namespace sdfibm{
@@ -15,17 +16,17 @@ class UGrid
 private:
     BBox m_bbox;
     int m_nx, m_ny, m_nz, m_nynz, m_num_cells;
-    double m_delta;
-    double m_deltaINV;
+    scalar m_delta;
+    scalar m_deltaINV;
     std::unordered_map<int, std::vector<int>> m_map;
 
 public:
-    UGrid(BBox& bbox, double delta);
+    UGrid(BBox& bbox, scalar delta);
 
     void generateCollisionPairs(std::vector<CollisionPair> &collision_pairs);
     void report(std::ostream& os = std::cout, bool detail = false);
 
-    inline void insert(double x, double y, double z, int id)
+    inline void insert(scalar x, scalar y, scalar z, int id)
     {
         m_map[hash(x, y, z)].push_back(id);
     }
@@ -47,7 +48,7 @@ private:
         return i*m_nynz + j*m_nz + k;
     }
 
-    inline int hash(double x, double y, double z) const
+    inline int hash(scalar x, scalar y, scalar z) const
     {
         int i = std::floor((x-m_bbox.low[0])*m_deltaINV);
         int j = std::floor((y-m_bbox.low[1])*m_deltaINV);

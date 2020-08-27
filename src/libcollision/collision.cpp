@@ -4,34 +4,34 @@ namespace sdfibm{
    1. it returns the overlap between two shapes -- collision occur when overlap > 0
    2. the normal points from the first towards the second shape */
 
-real sphereSphereCollision(const Solid& s1, const Solid& s2, vector& cP, vector& cN)
+scalar sphereSphereCollision(const Solid& s1, const Solid& s2, vector& cP, vector& cN)
 {
     Foam::vector s2s = s2.getCenter() - s1.getCenter();
     cN = Foam::normalised(s2s);
 
-    real r1 = s1.getShape()->getRadiusB();
-    real r2 = s2.getShape()->getRadiusB();
+    scalar r1 = s1.getShape()->getRadiusB();
+    scalar r2 = s2.getShape()->getRadiusB();
 
     cP = 0.5*(s1.getCenter() + s2.getCenter() + (r1 - r2)*cN);
     return r1 + r2 - Foam::mag(s2s);
 }
-real circleCircleCollision(const Solid& s1, const Solid& s2, vector& cP, vector& cN) {
+scalar circleCircleCollision(const Solid& s1, const Solid& s2, vector& cP, vector& cN) {
     return sphereSphereCollision(s1, s2, cP, cN); }
 
-real planeSphereCollision(const Solid& p, const Solid& s, vector& cP, vector& cN)
+scalar planeSphereCollision(const Solid& p, const Solid& s, vector& cP, vector& cN)
 {
     vector s_center = Foam::conjugate(p.getOrientation()).transform(s.getCenter() - p.getCenter());
-    real p2s = s_center.y();
+    scalar p2s = s_center.y();
     cN = p.getOrientation().transform(Foam::vector(0,1,0));
     cP = s.getCenter() - s.getRadiusB()*cN;
     return s.getRadiusB() - p2s;
 }
 
-real planeCircleCollision(const Solid& p, const Solid& s, vector& cP, vector& cN) {
+scalar planeCircleCollision(const Solid& p, const Solid& s, vector& cP, vector& cN) {
     return planeSphereCollision(p, s, cP, cN); }
-real spherePlaneCollision(const Solid& s, const Solid& p, vector& cP, vector& cN) {
+scalar spherePlaneCollision(const Solid& s, const Solid& p, vector& cP, vector& cN) {
     return planeSphereCollision(p, s, cP, cN); }
-real circlePlaneCollision(const Solid& s, const Solid& p, vector& cP, vector& cN) {
+scalar circlePlaneCollision(const Solid& s, const Solid& p, vector& cP, vector& cN) {
     return spherePlaneCollision(s, p, cP, cN); }
 
 collisionFunc collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC];

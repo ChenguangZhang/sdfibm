@@ -15,16 +15,16 @@ static std::map<std::string, int> SHAPE2ID = {
 };
 
 // 2d collision
-real circlePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
-real circleCircleCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
+scalar circlePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
+scalar circleCircleCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
 
 // 3d collision
-real spherePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
-real sphereSphereCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
+scalar spherePlaneCollision (const Solid&  c, const Solid&  p, vector& cP, vector& cN);
+scalar sphereSphereCollision(const Solid& c1, const Solid& c2, vector& cP, vector& cN);
 
-typedef real (*collisionFunc)(const Solid& s1, const Solid& s2, vector& cP, vector& cN);
+typedef scalar (*collisionFunc)(const Solid& s1, const Solid& s2, vector& cP, vector& cN);
 extern collisionFunc collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC]; // table of collsion handling functions
-// extern real (*collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC])(Solid& s1, Solid& s2, vector& cP, vector& cN);
+// extern scalar (*collisionFuncTable[kNUM_COL_FUNC][kNUM_COL_FUNC])(Solid& s1, Solid& s2, vector& cP, vector& cN);
 void InitCollisionFuncTable();
 collisionFunc getCollisionFunc(const std::string& name1, const std::string& name2);
 
