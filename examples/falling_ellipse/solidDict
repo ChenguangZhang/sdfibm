@@ -72,7 +72,7 @@ solids
       mat_name mat1;
       pos (0.5 3.5 0.0);
       vel (0.0 0.0 0.0);
-      euler (0.0 0.0 0.0);
+      euler (0.0 0.0 -45.0);
     }
 }
 
