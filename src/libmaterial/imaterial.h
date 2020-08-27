@@ -8,13 +8,13 @@ class IMaterial
 {
 private:
     // density
-    real m_rho;
+    scalar m_rho;
 public:
-    IMaterial(real rho = 1.0)
+    IMaterial(scalar rho = 1.0)
     {
         m_rho = rho;
     }
-    const real& getRho() const {return m_rho;}
+    const scalar& getRho() const {return m_rho;}
 };
 
 class MaterialDefault : public IMaterial

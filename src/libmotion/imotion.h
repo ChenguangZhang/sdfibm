@@ -31,7 +31,7 @@ public:
     virtual ~IMotion() = default;
 
     // the work horse
-    virtual void constraint(const real& time, vector& velocity, vector& omega) = 0;
+    virtual void constraint(const scalar& time, vector& velocity, vector& omega) = 0;
     virtual std::string description() const = 0; // more detailed information
 };
 
