@@ -7,6 +7,11 @@
 
 namespace sdfibm{
 
+#define CHECK_BAD_ARGUMENT(expression) \
+    if (! (expression)) { \
+        throw std::invalid_argument("Invalid argument!"); \
+    }
+
 namespace AsciiColors{
     static const std::string COLOR_NORMAL ="\033[0m";
     static const std::string COLOR_RED    ="\033[0;31;49m";
@@ -19,6 +24,12 @@ namespace AsciiColors{
     static const std::string COLOR_INFO   ="\033[0;32;49m";
     static const std::string COLOR_WARNING="\033[4;33;49m";
     static const std::string COLOR_ERROR  ="\033[1;31;43m";
+}
+
+inline std::string GenBanner(const std::string& title)
+{
+    unsigned int nside = (78 - title.length())/2;
+    return std::string(nside, '*') + ' ' + title +  ' ' + std::string(nside, '*') + '\n';
 }
 
 inline void PrintInfo(const std::string& message)
