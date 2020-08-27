@@ -10,13 +10,13 @@ int main(int argc, char *argv[])
     #include "initContinuityErrs.H"
 
     std::string dictfile;
+
+    // if start-time > 0, read from start-time-folder for solidDict, otherwise read from case root
     if(runTime.time().value() > 0)
     {
-        // if start from a nonzero time, the time folder must contain a solidDict file
         if(!Foam::Pstream::parRun())
             dictfile = "./" + mesh.time().timeName() + "/solidDict";
         else
-            // when parallel, all init from the master
             dictfile = "./processor0/" + mesh.time().timeName() + "/solidDict";
     }
     else
@@ -24,10 +24,7 @@ int main(int argc, char *argv[])
         dictfile = "solidDict";
     }
 
-    sdfibm::SolidCloud solidcloud(dictfile);
-
-    // link solid cloud with the fluid
-    solidcloud.linkFluid(U);
+    sdfibm::SolidCloud solidcloud(dictfile, U);
 
     while (runTime.loop())
     {
@@ -44,15 +41,13 @@ int main(int argc, char *argv[])
               ==0.5*fvm::laplacian(nu, U) + 0.5*fvc::laplacian(nu, U));
             UEqn.solve();
 
-            Foam::surfaceScalarField phiI("phiI", linearInterpolate(U) & mesh.Sf());
+            Foam::surfaceScalarField phiI("phiI", linearInterpolate(U-Fs*dt) & mesh.Sf());
             Foam::fvScalarMatrix pEqn(fvm::laplacian(p) == fvc::div(phiI)/dt);
-            pEqn.setReference(0, 0); // method of fvMatrix
             pEqn.solve();
 
             U   = U    - dt*fvc::grad(p);
             phi = phiI - dt*fvc::snGrad(p)*mesh.magSf();
 
-            // solve tracer after U
             Foam::fvScalarMatrix TEqn(
                 fvm::ddt(T)
               + fvm::div(phi, T)
@@ -65,13 +60,13 @@ int main(int argc, char *argv[])
         if(solidcloud.isOnFluid())
         {
             U = U - Fs*dt;
+            phi = phi - dt*(linearInterpolate(Fs)&mesh.Sf());
 
             U.correctBoundaryConditions();
             adjustPhi(phi, U, p);
             
             T = (1.0 - As)*T + Ts;
             T.correctBoundaryConditions();
-            Tphi = phi*fvc::interpolate(T);
 
             #include "continuityErrs.H"
         }
@@ -80,7 +75,7 @@ int main(int argc, char *argv[])
 
         if(solidcloud.isOnFluid())
         {
-            solidcloud.fixInternal();
+            solidcloud.fixInternal(dt.value());
         }
 
         if(runTime.outputTime())
@@ -99,6 +94,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    Info << "DONE\n" << endl;
+    Foam::Info << "DONE\n" << endl;
     return 0;
 }
