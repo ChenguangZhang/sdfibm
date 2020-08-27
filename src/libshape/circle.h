@@ -7,8 +7,8 @@ namespace sdfibm{
 class Circle : public IShape, _shapecreator<Circle>
 {
 private:
-    real m_radius;
-    real m_radiusSQR;
+    scalar m_radius;
+    scalar m_radiusSQR;
 
 public:
     // const static int shape_id = SHAPE::CIRC;
@@ -21,14 +21,14 @@ public:
         // set inherited variables
         m_volume = M_PI*m_radiusSQR;
         m_volumeINV = 1.0/m_volume;
-        real tmp = 0.5*m_volume*m_radiusSQR;
+        scalar tmp = 0.5*m_volume*m_radiusSQR;
         m_moi[0] = tmp; m_moi[4] = tmp; m_moi[8] = tmp;
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = m_radius;
     }
-    inline real getRadius() const { return m_radius;}
-    inline real getVolume() const { return m_volume;}
-    inline void setRadius(real r) {m_radius = r;}
+    inline scalar getRadius() const { return m_radius;}
+    inline scalar getVolume() const { return m_volume;}
+    inline void setRadius(scalar r) {m_radius = r;}
 
     // typename and description
     SHAPETYPENAME("Circle")
@@ -43,7 +43,7 @@ public:
         return _sdf_circle_bool_fast(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radiusSQR);
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& p,
             const vector& shape_center,
             const quaternion& shape_orientation) const override

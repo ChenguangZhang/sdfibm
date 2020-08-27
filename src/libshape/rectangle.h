@@ -7,9 +7,9 @@ namespace sdfibm{
 class Rectangle : public IShape, _shapecreator<Rectangle>
 {
 private:
-    real m_radiusa, m_radiusb;
-    real m_radiusaSQR;
-    real m_radiusbSQR;
+    scalar m_radiusa, m_radiusb;
+    scalar m_radiusaSQR;
+    scalar m_radiusbSQR;
 
 public:
     // const static int shape_id = SHAPE::CIRC;
@@ -25,14 +25,14 @@ public:
         m_volume = 4.0*m_radiusa*m_radiusb;
         m_volumeINV = 1.0/m_volume;
 
-        real tmp = 1.0/3.0*m_volume*(m_radiusaSQR + m_radiusbSQR);
+        scalar tmp = 1.0/3.0*m_volume*(m_radiusaSQR + m_radiusbSQR);
         m_moi[0] = tmp; m_moi[4] = tmp; m_moi[8] = tmp;
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = std::max(m_radiusa, m_radiusb);
     }
-    inline real getRadiusa() const { return m_radiusa;}
-    inline real getRadiusb() const { return m_radiusb;}
-    inline real getVolume() const { return m_volume;}
+    inline scalar getRadiusa() const { return m_radiusa;}
+    inline scalar getRadiusb() const { return m_radiusb;}
+    inline scalar getVolume() const { return m_volume;}
 
     // implement interface
     SHAPETYPENAME("Rectangle")
@@ -49,7 +49,7 @@ public:
                 m_radiusb);
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& p,
             const vector& shape_center,
             const quaternion& shape_orientation) const override

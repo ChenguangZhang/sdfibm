@@ -7,8 +7,8 @@ namespace sdfibm{
 class Plane : public IShape, _shapecreator<Plane>
 {
 private:
-    real m_radius;
-    real m_radiusSQR;
+    scalar m_radius;
+    scalar m_radiusSQR;
 
 public:
     // const static int shape_id = SHAPE::CIRC;
@@ -28,7 +28,7 @@ public:
         return p.y() < 0;
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& pworld,
             const vector& shape_center,
             const quaternion& shape_orientation) const override

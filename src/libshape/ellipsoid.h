@@ -7,8 +7,8 @@ namespace sdfibm{
 class Ellipsoid : public IShape, _shapecreator<Ellipsoid>
 {
 private:
-    real m_radiusa, m_radiusb, m_radiusc;
-    real m_radiusaSQRINV, m_radiusbSQRINV, m_radiuscSQRINV;
+    scalar m_radiusa, m_radiusb, m_radiusc;
+    scalar m_radiusaSQRINV, m_radiusbSQRINV, m_radiuscSQRINV;
 
 public:
     // const static int shape_id = SHAPE::CIRC;
@@ -31,10 +31,10 @@ public:
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = std::max(std::max(m_radiusa, m_radiusb),m_radiusc);
     }
-    inline real getRadiusa() const { return m_radiusa;}
-    inline real getRadiusb() const { return m_radiusb;}
-    inline real getRadiusc() const { return m_radiusc;}
-    inline real getVolume() const { return m_volume;}
+    inline scalar getRadiusa() const { return m_radiusa;}
+    inline scalar getRadiusb() const { return m_radiusb;}
+    inline scalar getRadiusc() const { return m_radiusc;}
+    inline scalar getVolume() const { return m_volume;}
 
     SHAPETYPENAME("Ellipsoid")
     virtual std::string description() const override {return "ellipsoid, [ra, rb, rc] = " + std::to_string(m_radiusa) + ", " + std::to_string(m_radiusb) + ", " + std::to_string(m_radiusc);}
@@ -53,7 +53,7 @@ public:
         );
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& p,
             const vector& shape_center,
             const quaternion& shape_orientation) const override

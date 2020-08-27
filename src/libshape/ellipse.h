@@ -7,8 +7,8 @@ namespace sdfibm{
 class Ellipse : public IShape, _shapecreator<Ellipse>
 {
 private:
-    real m_radiusa, m_radiusb;
-    real m_radiusaSQRINV, m_radiusbSQRINV;
+    scalar m_radiusa, m_radiusb;
+    scalar m_radiusaSQRINV, m_radiusbSQRINV;
 
 public:
     Ellipse(const dictionary& para)
@@ -24,14 +24,14 @@ public:
         m_volume = M_PI*m_radiusa*m_radiusb;
         m_volumeINV = 1.0/m_volume;
 
-        real tmp = 0.25*m_volume*(m_radiusa*m_radiusa + m_radiusb*m_radiusb);
+        scalar tmp = 0.25*m_volume*(m_radiusa*m_radiusa + m_radiusb*m_radiusb);
         m_moi[0] = tmp; m_moi[4] = tmp; m_moi[8] = tmp;
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = std::max(m_radiusa, m_radiusb);
     }
-    inline real getRadiusa() const { return m_radiusa;}
-    inline real getRadiusb() const { return m_radiusb;}
-    inline real getVolume()  const { return m_volume;}
+    inline scalar getRadiusa() const { return m_radiusa;}
+    inline scalar getRadiusb() const { return m_radiusb;}
+    inline scalar getVolume()  const { return m_volume;}
 
     // implement interface
     SHAPETYPENAME("Ellipse")
@@ -49,7 +49,7 @@ public:
         );
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& p,
             const vector& shape_center,
             const quaternion& shape_orientation) const override

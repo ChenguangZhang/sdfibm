@@ -7,12 +7,12 @@ namespace sdfibm{
 class Circle_Tail : public IShape, _shapecreator<Circle_Tail>
 {
 private:
-    real m_radius;
-    real m_ratio;   // tail-length/circle-radius to derive tail length
-    real m_radiusb; // tail-thickness
+    scalar m_radius;
+    scalar m_ratio;   // tail-length/circle-radius to derive tail length
+    scalar m_radiusb; // tail-thickness
 
-    real m_radiusSQR;
-    real m_radiusa;
+    scalar m_radiusSQR;
+    scalar m_radiusa;
 
 public:
     Circle_Tail(const dictionary& para)
@@ -27,13 +27,13 @@ public:
         // set inherited variables
         m_volume = M_PI*m_radiusSQR;
         m_volumeINV = 1.0/m_volume;
-        real tmp = 0.5*m_volume*m_radiusSQR;
+        scalar tmp = 0.5*m_volume*m_radiusSQR;
         m_moi[0] = tmp; m_moi[4] = tmp; m_moi[8] = tmp;
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = 2*m_radiusa;
     }
-    inline real getRadius() const { return m_radius;}
-    inline real getVolume() const { return m_volume;}
+    inline scalar getRadius() const { return m_radius;}
+    inline scalar getVolume() const { return m_volume;}
 
     // implement interface
     SHAPETYPENAME("Circle_Tail")
@@ -52,7 +52,7 @@ public:
         return _sdf_union({b1, b2});
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& pworld,
             const vector& shape_center,
             const quaternion& shape_orientation) const override
@@ -60,8 +60,8 @@ public:
         vector p = m_com + transform(pworld, shape_center, shape_orientation);
         p.z() = 0.0;
 
-        real d1 = _sdf_circle_real(p, m_radius);
-        real d2 = _sdf_rectangle_real(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)),
+        scalar d1 = _sdf_circle_real(p, m_radius);
+        scalar d2 = _sdf_rectangle_real(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)),
                             m_radiusa, m_radiusb);
 
         return _sdf_filter(_sdf_union({d1, d2}));

@@ -7,7 +7,7 @@ namespace sdfibm{
 class CHANGE : public IShape, _shapecreator<CHANGE>
 {
 private:
-    real m_radius; // define properties of your shape CHANGE
+    scalar m_radius; // define properties of your shape CHANGE
 
 public:
     // const static int shape_id = SHAPE::CIRC;
@@ -19,14 +19,14 @@ public:
 
         m_volume = M_PI*m_radiusSQR; // volume of your shape CHANGE
         m_volumeINV = 1.0/m_volume;
-        real tmp = 0.5*m_volume*m_radiusSQR; // moi of your shape CHANGE
+        scalar tmp = 0.5*m_volume*m_radiusSQR; // moi of your shape CHANGE
         m_moi[0] = tmp; m_moi[4] = tmp; m_moi[8] = tmp; // moi of your shape CHANGE
         m_moiINV = Foam::inv(m_moi);
         m_radiusB = m_radius; // bounding radius of your shape CHANGE
     }
     // how to get properties of your shape
-    inline real getRadius() const { return m_radius;}
-    inline real getVolume() const { return m_volume;}
+    inline scalar getRadius() const { return m_radius;}
+    inline scalar getVolume() const { return m_volume;}
 
     // typename and description
     SHAPETYPENAME("CHANGE")
@@ -43,7 +43,7 @@ public:
         return _sdf_circle_bool_fast(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radiusSQR); // CHANGE
     }
 
-    virtual inline real signedDistance(
+    virtual inline scalar signedDistance(
             const vector& p,
             const vector& shape_center,
             const quaternion& shape_orientation) const override
