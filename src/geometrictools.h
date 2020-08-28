@@ -23,7 +23,7 @@ public:
     scalar calcLineFraction(const scalar& phia, const scalar& phib) const;
     scalar calcFaceAreaFraction(const Foam::face& vertexInds, CacheMap& phis, label faceInd);
     scalar calcCellVolume(label cellInd, const Solid& solid, bool isTWOD);
-    inline void clearCache() {phiCache.clear();};
+    inline void clearCache() {phiCache.clear();}
 private:
     CacheMap phiCache;
 };

@@ -7,7 +7,6 @@
 #include "sstream"
 #include "./libmotion/motionfactory.h"
 #include "./libshape/shapefactory.h"
-
 namespace sdfibm {
 
 void SolidCloud::initFromDictionary(const Foam::word& dictfile)
@@ -245,7 +244,6 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U) :
     m_ptr_bbox->report(std::cout);
     m_ptr_ugrid = new UGrid(*m_ptr_bbox, 2*m_radiusB);
 
-    // read fluid rho
     const Foam::dictionary& transportProperties = m_mesh.lookupObject<Foam::IOdictionary>("transportProperties");
     const Foam::dimensionedScalar&          rho = transportProperties.lookup("rho");
     m_rhof = rho.value();
@@ -305,6 +303,7 @@ void SolidCloud::fixInternal(const scalar& dt)
 
 void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
 {
+    m_geotools.clearCache();
     const Foam::vectorField& cc = m_mesh.cellCentres();
     const Foam::scalarField& cv = m_mesh.V();
 
@@ -345,6 +344,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
 
         m_cellenum.Next();
     }
+
     Foam::Info << "#cell inside/border/all: " << numInsideCell << ' '
                << numBorderCell << ' ' << m_mesh.V().size() << Foam::endl;
 
@@ -376,7 +376,6 @@ void SolidCloud::interact(const scalar& time, const scalar& dt)
     m_As = 0.0;
     m_Fs = Foam::dimensionedVector("zero", Foam::dimAcceleration, Foam::vector::zero);
     m_Ts = Foam::dimensionedScalar("zero", Foam::dimTemperature, 0.0);
-    m_geotools.clearCache();
     using namespace std::chrono;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
@@ -385,6 +384,8 @@ void SolidCloud::interact(const scalar& time, const scalar& dt)
 
     for (Solid& solid : m_planes)
         solidFluidInteract(solid, dt);
+
+    checkAlpha();
 
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     duration<double> t_elapse = duration_cast<duration<double>>(t2 - t1);
@@ -437,7 +438,7 @@ void SolidCloud::solidSolidInteract()
 
 void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
 {
-    scalar cd; vector cP, cN; // (geometric) values to be found
+    scalar cd; vector cP, cN; // geometric values to be calculated
     collisionFunc cfunc = getCollisionFunc(s1.getShape()->getTypeName(), s2.getShape()->getTypeName());
     if (!cfunc)
     {
@@ -525,13 +526,7 @@ void SolidCloud::checkAlpha() const
 {
     forAll(m_mesh.cells(), icell)
     {
-        scalar alpha = m_As[icell];
-        if (alpha < 0 || alpha > 1)
-        {
-           Foam::Info << "Unbounded cell volume fraction!\n";
-           Foam::Info << "As[" << icell << "] = " << alpha << '\n';
-           Quit("Quit\n");
-        }
+        m_As[icell] = std::min(m_As[icell], scalar(1.0));
     }
 }
 
@@ -583,7 +578,7 @@ void SolidCloud::saveRestart(const std::string& filename)
             const Solid& s = m_solids[i];
             dictionary &solid = solids.subDict(solids.toc()[i]);
 
-            vector tmp; // place holder
+            vector tmp;
 
             tmp = s.getCenter(); if (m_ON_TWOD) tmp.z() = 0.0;
             solid.set("pos", tmp);
