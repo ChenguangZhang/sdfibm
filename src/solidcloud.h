@@ -13,15 +13,13 @@
 #include "utils.h"
 #include "logger.h"
 #include "geometrictools.h"
+#include "cellenumerator.h"
 
 #include "./libcollision/ugrid.h"
 #include "./libcollision/bbox.h"
 #include "./libcollision/collision.h"
-#include "cellenumerator.h"
 
 namespace sdfibm {
-
-class GeometricTools;
 
 class SolidCloud
 {
@@ -57,7 +55,7 @@ private:
     Foam::volScalarField& m_Ts;
 
     GeometricTools m_geotools;
-    CellEnumerator cellenum;
+    CellEnumerator m_cellenum;
 
     std::map<std::string, IMotion*  > m_libmotion;
     std::map<std::string, IMaterial*> m_libmat;

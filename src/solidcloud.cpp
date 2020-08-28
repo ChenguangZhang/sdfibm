@@ -217,7 +217,7 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U) :
     m_Fs (const_cast<Foam::volVectorField&>(m_mesh.lookupObject<Foam::volVectorField>("Fs"))),
     m_Ts (const_cast<Foam::volScalarField&>(m_mesh.lookupObject<Foam::volScalarField>("Ts"))),
     m_geotools(GeometricTools(m_mesh)),
-    cellenum(CellEnumerator(m_mesh))
+    m_cellenum(CellEnumerator(m_mesh))
 {
     m_solids.reserve(10);
     m_planes.reserve(10);
@@ -312,16 +312,16 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
     vector force  = vector::zero;
     vector torque = vector::zero;
 
-    cellenum.SetSolid(solid);
+    m_cellenum.SetSolid(solid);
 
     int numInsideCell = 0;
     int numBorderCell = 0;
     int insideType = solid.getID() + 4;
     scalar alpha = 0.0;
-    while (!cellenum.Empty())
+    while (!m_cellenum.Empty())
     {
-        int icur = cellenum.GetCurCellInd();
-        if (cellenum.GetCurCellType() == CellEnumerator::ALL_INSIDE)
+        int icur = m_cellenum.GetCurCellInd();
+        if (m_cellenum.GetCurCellType() == CellEnumerator::ALL_INSIDE)
         {
             ++numInsideCell;
             alpha = 1.0;
@@ -329,7 +329,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
         }
         else
         {
-            m_ct[icur] = cellenum.GetCurCellType();
+            m_ct[icur] = m_cellenum.GetCurCellType();
             ++numBorderCell;
             alpha = m_geotools.calcCellVolume(icur, solid, m_ON_TWOD)/cv[icur];
         }
@@ -343,7 +343,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
         m_As[icur] += alpha;
         m_Ts[icur] += alpha;
 
-        cellenum.Next();
+        m_cellenum.Next();
     }
     Foam::Info << "#cell inside/border/all: " << numInsideCell << ' '
                << numBorderCell << ' ' << m_mesh.V().size() << Foam::endl;

@@ -23,7 +23,6 @@ private:
 
     std::queue<int> m_queue;
     const Solid* mp_solid;
-    int m_seed;
 
     void _next();
 
