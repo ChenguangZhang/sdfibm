@@ -41,18 +41,12 @@ int main(int argc, char *argv[])
               ==0.5*fvm::laplacian(nu, U) + 0.5*fvc::laplacian(nu, U));
             UEqn.solve();
 
-            Foam::surfaceScalarField phiI("phiI", linearInterpolate(U-Fs*dt) & mesh.Sf());
-            Foam::fvScalarMatrix pEqn(fvm::laplacian(p) == fvc::div(phiI)/dt);
+            Foam::surfaceScalarField phiI("phiI", linearInterpolate(U) & mesh.Sf());
+            Foam::fvScalarMatrix pEqn(fvm::laplacian(p) == fvc::div(phiI)/dt - fvc::div(Fs));
             pEqn.solve();
 
             U   = U    - dt*fvc::grad(p);
             phi = phiI - dt*fvc::snGrad(p)*mesh.magSf();
-
-            Foam::fvScalarMatrix TEqn(
-                fvm::ddt(T)
-              + fvm::div(phi, T)
-              ==fvm::laplacian(alpha, T));
-            TEqn.solve();
         }
 
         solidcloud.interact(runTime.value(), dt.value());
@@ -60,13 +54,18 @@ int main(int argc, char *argv[])
         if(solidcloud.isOnFluid())
         {
             U = U - Fs*dt;
-            phi = phi - dt*(linearInterpolate(Fs)&mesh.Sf());
+            phi = phi - dt*(linearInterpolate(Fs) & mesh.Sf());
 
             U.correctBoundaryConditions();
             adjustPhi(phi, U, p);
             
             T = (1.0 - As)*T + Ts;
             T.correctBoundaryConditions();
+            Foam::fvScalarMatrix TEqn(
+                fvm::ddt(T)
+              + fvm::div(phi, T)
+              ==fvm::laplacian(alpha, T));
+            TEqn.solve();
 
             #include "continuityErrs.H"
         }
