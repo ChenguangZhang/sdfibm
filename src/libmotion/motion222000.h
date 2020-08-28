@@ -9,7 +9,7 @@ class Motion222000:public IMotion, _creator<Motion222000>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -29,10 +29,10 @@ public:
     TYPENAME("Motion222000") // a linear motion
     virtual string description() const override {return "move at prescribed (u,v,w), no rotation";}
 private:
-    real m_u, m_v, m_w;
+    scalar m_u, m_v, m_w;
 };
 
-void Motion222000::constraint(const real &time, vector &velocity, vector &omega)
+void Motion222000::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity = vector(m_u, m_v, m_w);
     omega    = vector::zero;

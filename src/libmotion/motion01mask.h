@@ -9,7 +9,7 @@ class Motion01Mask:public IMotion, _creator<Motion01Mask>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -57,7 +57,7 @@ private:
     vector vmask, omask;
 };
 
-void Motion01Mask::constraint(const real &time, vector &velocity, vector &omega)
+void Motion01Mask::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity = cmptMultiply(velocity, vmask);
     omega    = cmptMultiply(omega, omask);

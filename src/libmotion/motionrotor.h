@@ -9,7 +9,7 @@ class MotionRotor:public IMotion, _creator<MotionRotor>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -32,12 +32,12 @@ public:
     TYPENAME("MotionRotor")
     virtual string description() const override {return "rotate around origin with prescribed omega";}
 private:
-    real m_period, m_omega;
-    real m_radius, m_theta0;
-    real m_selfom;
+    scalar m_period, m_omega;
+    scalar m_radius, m_theta0;
+    scalar m_selfom;
 };
 
-void MotionRotor::constraint(const real &time, vector &velocity, vector &omega)
+void MotionRotor::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity = vector::zero;
     velocity[0] = -m_radius*m_omega*std::sin(m_omega*time + m_theta0);

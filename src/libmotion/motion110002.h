@@ -9,7 +9,7 @@ class Motion110002:public IMotion, _creator<Motion110002>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -29,10 +29,10 @@ public:
     TYPENAME("Motion110002") // a linear motion
     virtual string description() const override {return "only rotate in z with prescribed omega";}
 private:
-    real m_period, m_omega; // m_omegaz is only the z component
+    scalar m_period, m_omega; // m_omegaz is only the z component
 };
 
-void Motion110002::constraint(const real &time, vector &velocity, vector &omega)
+void Motion110002::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity[2] = 0.0;
     omega    = vector::zero;

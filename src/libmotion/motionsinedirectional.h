@@ -9,7 +9,7 @@ class MotionSineDirectional:public IMotion, _creator<MotionSineDirectional>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -35,13 +35,13 @@ public:
     TYPENAME("MotionSineDirectional") // a linear motion
     virtual string description() const override {return "oscillate as vec(x) = vec(x0) + a*sin(omega t)*vec(n), no rotation";}
 private:
-    real m_amplitude, m_period;
+    scalar m_amplitude, m_period;
     vector m_direction;
 
-    real m_omega;
+    scalar m_omega;
 };
 
-void MotionSineDirectional::constraint(const real &time, vector &velocity, vector &omega)
+void MotionSineDirectional::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity = m_amplitude * m_omega * std::cos(m_omega* time)*m_direction;
     omega    = vector::zero;

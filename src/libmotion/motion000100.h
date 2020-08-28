@@ -9,7 +9,7 @@ class Motion000100:public IMotion, _creator<Motion000100>
 public:
     // same signature for all motions
     virtual void constraint(
-            const real& time,
+            const scalar& time,
             vector& velocity,
             vector& omega) override final;
 
@@ -20,7 +20,7 @@ public:
     virtual string description() const override {return "only free to rotate in x";}
 };
 
-void Motion000100::constraint(const real &time, vector &velocity, vector &omega)
+void Motion000100::constraint(const scalar &time, vector &velocity, vector &omega)
 {
     velocity = vector::zero;
     omega[1] = 0; omega[2] = 0;
