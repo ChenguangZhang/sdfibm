@@ -27,7 +27,7 @@ volScalarField As (IOobject ("As", runTime.timeName(), mesh, IOobject::NO_READ, 
 volScalarField Ct (IOobject ("Ct", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::AUTO_WRITE ), mesh,
                     dimensionedScalar("Ct", dimless, 0.0), zeroGradientFvPatchScalarField::typeName);
 volVectorField Fs (IOobject ("Fs", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE ), mesh,
-                    dimensionedVector("Fs", dimAcceleration, vector::zero), zeroGradientFvPatchVectorField::typeName );
+                    dimensionedVector("Fs", dimAcceleration, vector::zero), fixedValueFvPatchVectorField::typeName );
 volScalarField T  (IOobject ( "T", runTime.timeName(), mesh, IOobject::MUST_READ, IOobject::AUTO_WRITE ), mesh );
 volScalarField Ts (IOobject ("Ts", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE ), mesh,
                    dimensionedScalar("NULL", dimensionSet(0, 0, 0, 1, 0, 0, 0), 0.0) );
