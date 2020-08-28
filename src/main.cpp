@@ -47,6 +47,12 @@ int main(int argc, char *argv[])
 
             U   = U    - dt*fvc::grad(p);
             phi = phiI - dt*fvc::snGrad(p)*mesh.magSf();
+
+            Foam::fvScalarMatrix TEqn(
+                fvm::ddt(T)
+              + fvm::div(phi, T)
+              ==fvm::laplacian(alpha, T));
+            TEqn.solve();
         }
 
         solidcloud.interact(runTime.value(), dt.value());
@@ -61,11 +67,6 @@ int main(int argc, char *argv[])
             
             T = (1.0 - As)*T + Ts;
             T.correctBoundaryConditions();
-            Foam::fvScalarMatrix TEqn(
-                fvm::ddt(T)
-              + fvm::div(phi, T)
-              ==fvm::laplacian(alpha, T));
-            TEqn.solve();
 
             #include "continuityErrs.H"
         }
