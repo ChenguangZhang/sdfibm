@@ -28,6 +28,7 @@ gradSchemes
 divSchemes
 {
     default         none;
+    div(Fs)         Gauss linear;
     div(phi,U)      Gauss linear;
     div(phi_0,U_0)  Gauss linear;
     div(phi,T)      Gauss vanLeer;
