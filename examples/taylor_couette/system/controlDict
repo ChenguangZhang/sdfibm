@@ -14,8 +14,7 @@ FoamFile
     object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-libs ( "libgroovyBC.so" ) ;
-application     ibm;
+application     sdfibm;
 
 startFrom       startTime;
 
