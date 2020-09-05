@@ -165,7 +165,7 @@ SolidCloud::SolidCloud()
     }
 }
 
-void SolidCloud::solidFluidInteract(Solid& solid, const real& dt)
+void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
 {
     // interaction of a single solid with fluid
     const Foam::fvMesh&       mesh = *m_ptr_Mesh;
@@ -388,7 +388,7 @@ void SolidCloud::writeVOF(const Foam::fvMesh& mesh)
 
     forAll(m_ptr_Mesh->cells(), icell)
     {
-        real alpha = m_ptr_As->operator[](icell);
+        scalar alpha = m_ptr_As->operator[](icell);
         if(alpha < 0 || alpha > 1 + 1e-6)
            Foam::Info << "Wrong volume fraction " << alpha << " at cell " << icell << '\n';
     }

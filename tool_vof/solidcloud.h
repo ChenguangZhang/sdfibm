@@ -31,7 +31,7 @@ private:
     std::vector<Solid> m_planes; // infinite planes (also solids)
 
     // collision handling
-    real m_radiusB; // maximum bounding radius of shapes
+    scalar m_radiusB; // maximum bounding radius of shapes
 
     // fluid
     Foam::fvMesh*         m_ptr_Mesh;
@@ -40,7 +40,7 @@ private:
     Foam::meshSearch* m_ms;
 
 private:
-    void solidFluidInteract(Solid& s,  const real& dt);
+    void solidFluidInteract(Solid& s,  const scalar& dt);
 
     void resolveCollisionPairs();
 
