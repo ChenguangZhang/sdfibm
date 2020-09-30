@@ -24,7 +24,7 @@ LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -lmeshTools
 
 
 APPSOURCES=main.cpp solidcloud.cpp
-APPOBJECTS=$(APPSOURCES:.cpp=.o)
+APPOBJECTS=$(APPSOURCES:.cpp=.o) ../src/meshinfo.o ../src/cellenumerator.o ../src/geometrictools.o
 
 APPTARGET=smoothvof
 LIBTARGETLINK=-L. -L../src/libmotion -lmotion -L../src/libshape -lshape -L../src/libshape -lshape -L../src/libcollision -lcollision
@@ -47,7 +47,7 @@ $(APPTARGET): $(APPOBJECTS)
 	$(CC) -o $@ $(APPOBJECTS) $(LIBMPI) $(LIBTARGETLINK) $(LDFLAGS)
 
 clean:
-	rm $(LIBOBJECTS) $(APPOBJECTS) $(APPTARGET)
+	rm $(LIBOBJECTS) $(APPSOURCES:.cpp=.o) $(APPTARGET)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@ $(INFLAGS) -c

@@ -2,7 +2,7 @@
 #define PLANE_H
 
 #include "ishape.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class Plane : public IShape, _shapecreator<Plane>
 {
