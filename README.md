@@ -71,6 +71,20 @@ Lastly, the tool works with arbitrary polyhedron meshes, see figure below (left:
 
 ![init_on_poly](./figs/init_on_poly.png)
 
+
+# Extracting sampling location on the solid surface
+
+Initially I thought about writing locations from sdfibm, but actually ParaView contour can do the same thing. It is also more flexible, because you can specify the contour value to slightly offset from the real solid surface.
+
+Here are the steps for 2D cases.
+- First, read only the front surface. In case you don't have a separate front patch, you can create a slice of the 3D volume.
+- Second, apply the "Contour" filter. Certainly, it should be contoured by As and a reasonable (single) contour value is 0.5.
+- Third, apply the "ExtractSurface" filter.
+- Fourth, from the menu, File -> Save Data ..., choose csv format. ParaView will ask you to choose the data to save. The final output will contain the xy location of the contour and the data (such as U, p, etc.) at those contour locations.
+
+Cheers.
+
+
 # Code files
 
 - `libshape` contains shape definitions using SDF
