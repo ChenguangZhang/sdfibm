@@ -67,6 +67,8 @@ public:
         scalar c = std::cos(th);
         return vector(p.x()*c+p.y()*s,-p.x()*s+p.y()*c, 0.0);
     }
+    static inline scalar _clamp(scalar x, scalar a, scalar b)
+    {return  (x>b)?b:((x<a)?a:x);}
 
     // mirror regarding to x-axis and y-axis
     static inline vector _sdf_flipy(const vector& p) {return vector( p.x(), -p.y(), p.z());}

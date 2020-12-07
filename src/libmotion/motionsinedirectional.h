@@ -2,7 +2,7 @@
 #define MOTIONSINEDIRECTIONAL_H
 
 #include "imotion.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class MotionSineDirectional:public IMotion, _creator<MotionSineDirectional>
 {

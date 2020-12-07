@@ -2,7 +2,7 @@
 #define MOTIONROTOR_H
 
 #include "imotion.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class MotionRotor:public IMotion, _creator<MotionRotor>
 {
