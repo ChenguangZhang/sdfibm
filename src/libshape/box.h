@@ -2,7 +2,7 @@
 #define BOX_H
 
 #include "ishape.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class Box : public IShape, _shapecreator<Box>
 {
@@ -37,25 +37,19 @@ public:
     virtual std::string description() const override {return "Box, [ra, rb, rc] = " + std::to_string(m_radiusa) + ", " + std::to_string(m_radiusb) + ", " + std::to_string(m_radiusc);}
 
     // implement interface
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        return _sdf_box_bool(
-                m_com + transform(p, shape_center, shape_orientation),
+        return sdf::box_bool(
+                m_com + p,
                 m_radiusa,
                 m_radiusb,
                 m_radiusc);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        return _sdf_filter(_sdf_box_real(
-                    m_com + transform(p, shape_center, shape_orientation),
+        return sdf::filter(sdf::box(
+                    m_com + p,
                     m_radiusa,
                     m_radiusb,
                     m_radiusc)

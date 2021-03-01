@@ -1,7 +1,7 @@
 #include "logger.h"
 #include <fstream>
 
-namespace sdfibm{
+namespace sdfibm {
 
 Logger*  Logger::m_this = nullptr;
 const std::string Logger::m_logfilename = "cloud.log";

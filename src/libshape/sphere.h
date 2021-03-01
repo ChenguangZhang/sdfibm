@@ -34,20 +34,14 @@ public:
     SHAPETYPENAME("Sphere")
     virtual std::string description() const override {return "sphere, r = " + std::to_string(m_radius);}
 
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const
+    virtual inline bool isInside(const vector& p) const
     {
-        return _sdf_circle_bool_fast(m_com + p - shape_center, m_radiusSQR);
+        return sdf::circle_bool_fast(m_com + p, m_radiusSQR);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const
+    virtual inline scalar signedDistance(const vector& p) const
     {
-        return _sdf_filter(_sdf_circle_real(m_com + p - shape_center, m_radius));
+        return sdf::filter(sdf::circle(m_com + p, m_radius));
     }
 
 };

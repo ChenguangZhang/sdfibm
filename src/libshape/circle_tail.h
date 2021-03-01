@@ -39,32 +39,25 @@ public:
     SHAPETYPENAME("Circle_Tail")
     virtual std::string description() const override {return "Circle_Tail (x-y plane), r = " + std::to_string(m_radius);}
 
-    virtual inline bool isInside(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        vector p = m_com + transform(pworld, shape_center, shape_orientation);
-        p.z() = 0.0;
+        vector p2d = m_com + p; p2d.z() = 0.0;
 
-        bool b1 = _sdf_rectangle_bool(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)), m_radiusa, m_radiusb);
-        bool b2 = _sdf_circle_bool_fast(vector(p.x(), p.y(), 0.0), m_radiusSQR);
-        return _sdf_union({b1, b2});
+        bool b1 = sdf::rectangle_bool(sdf::offset(p2d, vector(m_radiusa, 0.0, 0.0)), m_radiusa, m_radiusb);
+        bool b2 = sdf::circle_bool_fast(vector(p2d.x(), p2d.y(), 0.0), m_radiusSQR);
+
+        return sdf::U({b1, b2});
     }
 
-    virtual inline scalar signedDistance(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        vector p = m_com + transform(pworld, shape_center, shape_orientation);
-        p.z() = 0.0;
+        vector p2d = m_com + p; p2d.z() = 0.0;
 
-        scalar d1 = _sdf_circle_real(p, m_radius);
-        scalar d2 = _sdf_rectangle_real(_sdf_offset(p, vector(m_radiusa, 0.0, 0.0)),
+        scalar d1 = sdf::circle(p2d, m_radius);
+        scalar d2 = sdf::rectangle(sdf::offset(p2d, vector(m_radiusa, 0.0, 0.0)),
                             m_radiusa, m_radiusb);
 
-        return _sdf_filter(_sdf_union({d1, d2}));
+        return sdf::filter(sdf::U({d1, d2}));
     }
 };
 

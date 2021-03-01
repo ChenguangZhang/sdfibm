@@ -38,24 +38,20 @@ public:
     SHAPETYPENAME("Rectangle")
     virtual std::string description() const override {return "rectangle (x-y plane), [ra, rb] = " + std::to_string(m_radiusa) + ", " + std::to_string(m_radiusb);}
 
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        return _sdf_rectangle_bool(
-                m_com + transform(p, shape_center, shape_orientation),
+        vector p2d = m_com + p; p2d.z() = 0.0;
+        return sdf::rectangle_bool(
+                p2d,
                 m_radiusa,
                 m_radiusb);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        return _sdf_filter(_sdf_rectangle_real(
-                    m_com + transform(p, shape_center, shape_orientation),
+        vector p2d = m_com + p; p2d.z() = 0.0;
+        return sdf::filter(sdf::rectangle(
+                    p2d,
                     m_radiusa,
                     m_radiusb)
         );

@@ -2,7 +2,7 @@
 #define ELLIPSE_H
 
 #include "ishape.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class Ellipse : public IShape, _shapecreator<Ellipse>
 {
@@ -37,29 +37,19 @@ public:
     SHAPETYPENAME("Ellipse")
     virtual std::string description() const override {return "ellipse (x-y plane), [ra, rb] = " + std::to_string(m_radiusa) + ", " + std::to_string(m_radiusb);}
 
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        return _sdf_ellipse_bool_fast(
-                m_com + transform(p, shape_center, shape_orientation),
-                m_radiusaSQRINV,
-                m_radiusbSQRINV
-        );
+        vector p2d = m_com + p; p2d.z() = 0.0;
+
+        return sdf::ellipse_bool_fast(p2d, m_radiusaSQRINV, m_radiusbSQRINV);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        return _sdf_filter(
-            _sdf_ellipse_real_fast(
-                m_com + transform(p,shape_center,shape_orientation),
-                m_radiusaSQRINV,
-                m_radiusbSQRINV
-           )
+        vector p2d = m_com + p; p2d.z() = 0.0;
+
+        return sdf::filter(
+            sdf::ellipse(p2d, m_radiusaSQRINV, m_radiusbSQRINV)
         );
     }
 };

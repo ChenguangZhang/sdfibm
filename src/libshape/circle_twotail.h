@@ -39,40 +39,30 @@ public:
     SHAPETYPENAME("Circle_TwoTail")
     virtual std::string description() const override {return "Circle_TwoTail (x-y plane), r = " + std::to_string(m_radius);}
 
-    virtual inline bool isInside(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        vector p = m_com + transform(pworld, shape_center, shape_orientation);
-        p.z() = 0.0;
+        vector p2d = m_com + p; p2d.z() = 0.0;
 
-        bool dc = _sdf_circle_bool_fast(p, m_radiusSQR);
-        bool d1 = _sdf_rectangle_bool(_sdf_offset(_sdf_rot30(p), vector(m_radiusa, 0.0, 0.0)),
+        bool dc = sdf::circle_bool_fast(p2d, m_radiusSQR);
+        bool d1 = sdf::rectangle_bool(sdf::offset(sdf::rot30(            p2d), vector(m_radiusa, 0, 0)),
                     m_radiusa, m_radiusb);
-        bool d2 = _sdf_rectangle_bool(_sdf_offset(_sdf_rot30(_sdf_flipy(p)), vector(m_radiusa, 0.0, 0.0)),
+        bool d2 = sdf::rectangle_bool(sdf::offset(sdf::rot30(sdf::flipy(p2d)), vector(m_radiusa, 0, 0)),
                     m_radiusa, m_radiusb);
 
-        return _sdf_union({dc, d1, d2});
+        return sdf::U({dc, d1, d2});
     }
 
-    virtual inline scalar signedDistance(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        vector p = m_com + transform(pworld, shape_center, shape_orientation);
-        p.z() = 0.0;
+        vector p2d = m_com + p; p2d.z() = 0.0;
 
-        scalar dc = _sdf_circle_real(p, m_radius);
-        scalar d1 = _sdf_rectangle_real(_sdf_offset(_sdf_rot30(p), vector(m_radiusa, 0.0, 0.0)),
+        scalar dc = sdf::circle(p2d, m_radius);
+        scalar d1 = sdf::rectangle(sdf::offset(sdf::rot30(            p2d), vector(m_radiusa, 0, 0)),
                     m_radiusa, m_radiusb);
-        scalar d2 = _sdf_rectangle_real(_sdf_offset(_sdf_rot30(_sdf_flipy(p)), vector(m_radiusa, 0.0, 0.0)),
+        scalar d2 = sdf::rectangle(sdf::offset(sdf::rot30(sdf::flipy(p2d)), vector(m_radiusa, 0, 0)),
                     m_radiusa, m_radiusb);
 
-        return _sdf_filter(
-                    _sdf_union({dc, d1, d2})
-        );
+        return sdf::filter(sdf::U({dc, d1, d2}));
     }
 };
 

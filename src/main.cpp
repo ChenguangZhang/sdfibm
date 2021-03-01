@@ -41,12 +41,12 @@ int main(int argc, char *argv[])
               ==0.5*fvm::laplacian(nu, U) + 0.5*fvc::laplacian(nu, U));
             UEqn.solve();
 
-            Foam::surfaceScalarField phiI("phiI", linearInterpolate(U) & mesh.Sf());
-            Foam::fvScalarMatrix pEqn(fvm::laplacian(p) == fvc::div(phiI)/dt - fvc::div(Fs));
+            phi = linearInterpolate(U) & mesh.Sf();
+            Foam::fvScalarMatrix pEqn(fvm::laplacian(p) == fvc::div(phi)/dt - fvc::div(Fs));
             pEqn.solve();
 
-            U   = U    - dt*fvc::grad(p);
-            phi = phiI - dt*fvc::snGrad(p)*mesh.magSf();
+            U   = U   - dt*fvc::grad(p);
+            phi = phi - dt*fvc::snGrad(p)*mesh.magSf();
 
             Foam::fvScalarMatrix TEqn(
                 fvm::ddt(T)

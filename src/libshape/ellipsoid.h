@@ -2,7 +2,7 @@
 #define ELLIPSOID_H
 
 #include "ishape.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class Ellipsoid : public IShape, _shapecreator<Ellipsoid>
 {
@@ -40,31 +40,15 @@ public:
     virtual std::string description() const override {return "ellipsoid, [ra, rb, rc] = " + std::to_string(m_radiusa) + ", " + std::to_string(m_radiusb) + ", " + std::to_string(m_radiusc);}
 
     // implement interface
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        return _sdf_ellipsoid_bool_fast(
-                transform(p, shape_center, shape_orientation),
-                m_radiusaSQRINV,
-                m_radiusbSQRINV,
-                m_radiuscSQRINV
-        );
+        return sdf::ellipsoid_bool_fast(p, m_radiusaSQRINV, m_radiusbSQRINV, m_radiuscSQRINV);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        return _sdf_filter(
-            _sdf_ellipsoid_real_fast(
-                transform(p,shape_center,shape_orientation),
-                m_radiusaSQRINV,
-                m_radiusbSQRINV,
-                m_radiuscSQRINV
-           )
+        return sdf::filter(
+            sdf::ellipsoid( p, m_radiusaSQRINV, m_radiusbSQRINV, m_radiuscSQRINV)
         );
     }
 };

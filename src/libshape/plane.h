@@ -19,21 +19,13 @@ public:
     virtual std::string description() const override {return "Plane (x-z plane)";}
 
     // implement interface
-    virtual inline bool isInside(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        vector p = transform(pworld, shape_center, shape_orientation);
         return p.y() < 0;
     }
 
-    virtual inline scalar signedDistance(
-            const vector& pworld,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        vector p = transform(pworld, shape_center, shape_orientation);
         return p.y();
     }
 };

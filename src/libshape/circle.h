@@ -35,20 +35,14 @@ public:
     virtual std::string description() const override {return "circle (x-y plane), r = " + std::to_string(m_radius);}
 
     // implement interface
-    virtual inline bool isInside(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline bool isInside(const vector& p) const override
     {
-        return _sdf_circle_bool_fast(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radiusSQR);
+        return sdf::circle_bool_fast(m_com + vector(p.x(), p.y(), 0.0), m_radiusSQR);
     }
 
-    virtual inline scalar signedDistance(
-            const vector& p,
-            const vector& shape_center,
-            const quaternion& shape_orientation) const override
+    virtual inline scalar signedDistance(const vector& p) const override
     {
-        return _sdf_filter(_sdf_circle_real(m_com + vector(p.x(), p.y(),0.0)-shape_center, m_radius));
+        return sdf::filter(sdf::circle(m_com + vector(p.x(), p.y(), 0.0), m_radius));
     }
 };
 }

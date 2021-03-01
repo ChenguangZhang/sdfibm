@@ -12,8 +12,7 @@
 #define LOG(m) Logger::GetLogger()->log(m)
 #define LOGF Logger::m_logfile
 
-namespace sdfibm{
-
+namespace sdfibm {
 
 class Logger
 {
