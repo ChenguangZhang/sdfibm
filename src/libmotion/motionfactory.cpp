@@ -63,4 +63,6 @@ REGISTERMOTION(Motion100100);
 REGISTERMOTION(Motion01Mask);
 #include "motionrotor.h"
 REGISTERMOTION(MotionRotor);
+#include "motionopenclose.h"
+REGISTERMOTION(MotionOpenClose);
 
