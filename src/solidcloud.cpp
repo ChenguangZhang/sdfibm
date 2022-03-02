@@ -442,8 +442,10 @@ void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
     collisionFunc cfunc = getCollisionFunc(s1.getShape()->getTypeName(), s2.getShape()->getTypeName());
     if (!cfunc)
     {
-        Foam::Info << "Collision between shape type " << s1.getShape()->getTypeName() << " and " << s2.getShape()->getTypeName() << " is not implemented!\n\n";
-        Quit("Error (feature not implemented)");
+        // The collision between the two solid shapes is not implemented. This SHOULD BE issued as an warning message to the use. However, doing do greatly bloats the terminal (or log file). As a temporary solution, we simply skip the collision detection.
+        // Mar. 1, 2022. Chenguang Zhang
+        // Foam::Info << "Warning: collision between shapes " << s1.getShape()->getTypeName() << " and " << s2.getShape()->getTypeName() << " is not implemented. Skip!\n\n";
+        return;
     }
     cd = cfunc(s1, s2, cP, cN); 
 
