@@ -37,7 +37,6 @@ void Motion000002::constraint(const scalar &time, vector &velocity, vector &omeg
     velocity = vector::zero;
     omega    = vector::zero;
     omega[2] = m_omega;
-    std::cout << "set motion Motion000002 to" << m_omega << std::endl;
 }
 
 }
