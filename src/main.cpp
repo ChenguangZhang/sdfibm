@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
         dictfile = "solidDict";
     }
 
-    sdfibm::SolidCloud solidcloud(dictfile, U);
+    sdfibm::SolidCloud solidcloud(dictfile, U, runTime.value());
+    solidcloud.saveState();  // write the initial condition
 
     while (runTime.loop())
     {
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
         }
 
         solidcloud.evolve(runTime.value(), dt.value());
+        solidcloud.saveState();
 
         if(solidcloud.isOnFluid())
         {

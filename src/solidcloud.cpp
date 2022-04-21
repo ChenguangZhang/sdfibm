@@ -24,7 +24,8 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
     const dictionary& meta = root.subDict("meta");
     m_ON_FLUID = Foam::readBool(meta.lookup("on_fluid"));
     m_ON_TWOD  = Foam::readBool(meta.lookup("on_twod"));
-    m_gravity = meta.lookup("gravity");
+    m_gravity  = meta.lookup("gravity");
+    m_writeFrequency = meta.lookupOrDefault("writeFrequency", 1);
 
     // log meta information
     if (Foam::Pstream::master())
@@ -208,7 +209,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
 }
 
 // ctor
-SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U) :
+SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scalar time = 0.0) :
     m_mesh(U.mesh()),
     m_Uf (U),
     m_ct (const_cast<Foam::volScalarField&>(m_mesh.lookupObject<Foam::volScalarField>("Ct"))),
@@ -218,6 +219,9 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U) :
     m_geotools(GeometricTools(m_mesh)),
     m_cellenum(CellEnumerator(m_mesh))
 {
+    m_time = time;
+    m_timeStepCounter = 0;
+    m_writeFrequency = 1;
     m_solids.reserve(10);
     m_planes.reserve(10);
 
@@ -436,6 +440,7 @@ void SolidCloud::solidSolidInteract()
             solidSolidCollision(p, s);
 }
 
+
 void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
 {
     scalar cd; vector cP, cN; // geometric values to be calculated
@@ -468,6 +473,7 @@ void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
 
 void SolidCloud::evolve(const scalar& time, const scalar& dt)
 {
+    m_time = time;
     static label N_SUBITER = 20;
     if (m_solids.size() == 1) N_SUBITER = 1;
     scalar dt_sub = dt / N_SUBITER;
@@ -519,9 +525,6 @@ void SolidCloud::evolve(const scalar& time, const scalar& dt)
 
     for (Solid& solid : m_solids)
         solid.storeOldFluidForce();
-
-    if (Foam::Pstream::master())
-        saveState(time);
 }
 
 void SolidCloud::checkAlpha() const
@@ -538,35 +541,81 @@ scalar SolidCloud::totalSolidVolume() const
     return Foam::gSum(m_As*cell_vol);
 }
 
-void SolidCloud::saveState(const scalar& time)
+void SolidCloud::saveState()
 {
-    vector v;
-    for (Solid& solid : m_solids)
+    if (Foam::Pstream::master())
     {
-        statefile << time << ' ';
-        v = solid.getCenter();  statefile << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-        v = solid.getVelocity();statefile << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-        v = solid.getForce();   statefile << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-
-        v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getOmega();   statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getTorque();  statefile << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+        if (m_timeStepCounter % m_writeFrequency == 0)
+        {
+            statefile << (*this);
+            statefile.flush();
+        }
+        ++m_timeStepCounter;
     }
+}
 
-    for (Solid& solid : m_planes)
+std::ostream& operator<<(std::ostream& os, const SolidCloud& sc)
+{
+    // 3d cases save full  data: 1+18 columns
+    // 2d cases save fewer data: 1+ 9 columns (time,xc,yc,ux,uy,fx,fy,ez,omegaz,tz).  
+    if (sc.m_ON_TWOD)
     {
-        statefile << time << ' ';
-        v = solid.getCenter();  statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getVelocity();statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getForce();   statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+        vector v;
+        for (const Solid& solid : sc.m_solids)
+        {
+            os << sc.m_time << ' ';
+            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ';
+            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ';
+            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ';
+            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
+                                    os << v.z() << ' ';
+            v = solid.getOmega();   os << v.z() << ' ';
+            v = solid.getTorque();  os << v.z() << '\n';
+        }
 
-        v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getOmega();   statefile << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-        v = solid.getTorque();  statefile << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+        for (const Solid& solid : sc.m_planes)
+        {
+            os << sc.m_time << ' ';
+            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ';
+            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ';
+            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ';
+
+            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
+                                    os << v.z() << ' ';
+            v = solid.getOmega();   os << v.z() << ' ';
+            v = solid.getTorque();  os << v.z() << '\n';
+        }
     }
-    statefile.flush();
+    else
+    {
+        vector v;
+        for (const Solid& solid : sc.m_solids)
+        {
+            os << sc.m_time << ' ';
+            v = solid.getCenter();  os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
+            v = solid.getVelocity();os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
+            v = solid.getForce();   os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
+
+            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
+                                    os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getOmega();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getTorque();  os << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+        }
+
+        for (const Solid& solid : sc.m_planes)
+        {
+            os << sc.m_time << ' ';
+            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+
+            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
+                                    os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getOmega();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
+            v = solid.getTorque();  os << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
+        }
+    }
+    return os;
 }
 
 void SolidCloud::saveRestart(const std::string& filename)

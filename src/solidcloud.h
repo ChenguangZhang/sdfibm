@@ -28,6 +28,11 @@ private:
     bool m_ON_TWOD;  // is 2-d?
     bool m_ON_VOFONLY;
     bool m_ON_RESTART;
+
+    unsigned int m_timeStepCounter;
+    unsigned int m_writeFrequency;
+    scalar m_time;
+
     SolidCloud (const SolidCloud&) = delete;
     SolidCloud& operator=(const SolidCloud&) = delete;
 
@@ -67,11 +72,11 @@ private:
     void solidSolidCollision(Solid& s1, Solid& s2);
     void resolveCollisionPairs();
 
-    void solidFluidInteract(Solid& s,  const scalar& dt);
-    void solidFluidCorrect(Solid& s, const scalar& dt);
+    void solidFluidInteract(Solid& s, const scalar& dt);
+    void solidFluidCorrect (Solid& s, const scalar& dt);
 
 public:
-    SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U);
+    SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scalar time);
     ~SolidCloud();
 
     // setup
@@ -80,7 +85,7 @@ public:
     void addBoundingBox(const BBox& particle_bbox);
 
     // io
-    void saveState(const scalar& time);
+    void saveState();
     void initFromDictionary(const Foam::word& dictname);
     void saveRestart(const std::string& filename);
     const Solid& operator[](label i) const;
@@ -89,7 +94,7 @@ public:
     void checkAlpha() const;
     scalar totalSolidVolume() const;
     bool inline isOnFluid() const {return m_ON_FLUID;}
-    bool inline isOnTwoD() const  {return m_ON_TWOD;}
+    bool inline isOnTwoD()  const {return m_ON_TWOD;}
 
     // time stepping
     void storeOld();
@@ -99,8 +104,9 @@ public:
     void addMidEnvironment();
     void fixInternal(const scalar& dt);
     void initialCorrect();
+
+    friend std::ostream& operator<<(std::ostream& os, const SolidCloud& sc);
 };
 
 }
 #endif
-
