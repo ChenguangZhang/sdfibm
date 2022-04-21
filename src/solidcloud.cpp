@@ -358,17 +358,8 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
     // a solid may cover several partitions with each contributing some "partial" force
     if (Foam::Pstream::parRun())
     {
-        // init *PerCPU with local force/torque
-        Foam::vector forcePerCPU (force);
-        Foam::vector torquePerCPU(torque);
-        // parallel reduction
-        Foam::reduce(forcePerCPU , Foam::sumOp<Foam::vector>());
-        Foam::reduce(torquePerCPU, Foam::sumOp<Foam::vector>());
-        // now *PerCPU contain the global sum
-        force = forcePerCPU;
-        torque= torquePerCPU;
-        Foam::Pstream::scatter(force);
-        Foam::Pstream::scatter(torque);
+        Foam::reduce(force,  Foam::sumOp<Foam::vector>());
+        Foam::reduce(torque, Foam::sumOp<Foam::vector>());
     }
     solid.setFluidForceAndTorque(force, torque);
 }
@@ -560,60 +551,27 @@ std::ostream& operator<<(std::ostream& os, const SolidCloud& sc)
     // 2d cases save fewer data: 1+ 9 columns (time,xc,yc,ux,uy,fx,fy,ez,omegaz,tz).  
     if (sc.m_ON_TWOD)
     {
-        vector v;
         for (const Solid& solid : sc.m_solids)
         {
             os << sc.m_time << ' ';
-            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ';
-            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ';
-            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ';
-            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                    os << v.z() << ' ';
-            v = solid.getOmega();   os << v.z() << ' ';
-            v = solid.getTorque();  os << v.z() << '\n';
+            write2D(os, solid);
+            os << '\n';
         }
 
         for (const Solid& solid : sc.m_planes)
         {
             os << sc.m_time << ' ';
-            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ';
-            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ';
-            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ';
-
-            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                    os << v.z() << ' ';
-            v = solid.getOmega();   os << v.z() << ' ';
-            v = solid.getTorque();  os << v.z() << '\n';
+            write2D(os, solid);
+            os << '\n';
         }
     }
     else
     {
-        vector v;
         for (const Solid& solid : sc.m_solids)
-        {
-            os << sc.m_time << ' ';
-            v = solid.getCenter();  os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-            v = solid.getVelocity();os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-            v = solid.getForce();   os << v[0] << ' ' << v[1] << ' ' << v[2] << ' ';
-
-            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                    os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getOmega();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getTorque();  os << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
-        }
+            os << sc.m_time << ' ' << solid << '\n';
 
         for (const Solid& solid : sc.m_planes)
-        {
-            os << sc.m_time << ' ';
-            v = solid.getCenter();  os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getVelocity();os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getForce();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-
-            v = solid.getOrientation().eulerAngles(quaternion::XYZ);
-                                    os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getOmega();   os << v.x() << ' ' << v.y() << ' ' << v.z() << ' ';
-            v = solid.getTorque();  os << v.x() << ' ' << v.y() << ' ' << v.z() << '\n';
-        }
+            os << sc.m_time << ' ' << solid << '\n';
     }
     return os;
 }
