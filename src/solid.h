@@ -213,6 +213,8 @@ public:
     }
 
     ~Solid(){}
+    friend std::ostream& operator<<(std::ostream& os, const Solid& s);
+    friend void write2D(std::ostream& os, const Solid& s);
 };
 
 }
