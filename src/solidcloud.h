@@ -23,6 +23,10 @@ namespace sdfibm {
 
 class SolidCloud
 {
+    // disallow copy constructor and assignment operator
+    SolidCloud (const SolidCloud&) = delete;
+    SolidCloud& operator=(const SolidCloud&) = delete;
+
 private:
     bool m_ON_FLUID; // is fsi?
     bool m_ON_TWOD;  // is 2-d?
@@ -32,9 +36,6 @@ private:
     unsigned int m_timeStepCounter;
     unsigned int m_writeFrequency;
     scalar m_time;
-
-    SolidCloud (const SolidCloud&) = delete;
-    SolidCloud& operator=(const SolidCloud&) = delete;
 
 private:
     std::vector<Solid> m_solids; // finite solids
@@ -72,16 +73,16 @@ private:
     void solidSolidCollision(Solid& s1, Solid& s2);
     void resolveCollisionPairs();
 
-    void solidFluidInteract(Solid& s, const scalar& dt);
-    void solidFluidCorrect (Solid& s, const scalar& dt);
+    void solidFluidInteract(Solid& s, scalar dt);
+    void solidFluidCorrect (Solid& s, scalar dt);
 
 public:
     SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scalar time);
     ~SolidCloud();
 
     // setup
-    inline void addSolid(const Solid& solid) { m_solids.push_back(solid); }
-    inline void addPlane(const Solid& solid) { m_planes.push_back(solid); }
+    inline void addSolid(Solid&& solid) { m_solids.emplace_back(solid); }
+    inline void addPlane(Solid&& solid) { m_planes.emplace_back(solid); }
     void addBoundingBox(const BBox& particle_bbox);
 
     // io
@@ -99,10 +100,10 @@ public:
     // time stepping
     void storeOld();
     void restoreOld();
-    void evolve  (const scalar& time, const scalar& dt);
-    void interact(const scalar& time, const scalar& dt);
+    void evolve  (scalar time, scalar dt);
+    void interact(scalar time, scalar dt);
     void addMidEnvironment();
-    void fixInternal(const scalar& dt);
+    void fixInternal(scalar dt);
     void initialCorrect();
 
     friend std::ostream& operator<<(std::ostream& os, const SolidCloud& sc);

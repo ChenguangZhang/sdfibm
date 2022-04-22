@@ -72,7 +72,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         // find the maximum bounding radius, used to create the uniform grid for collision detection
         if (Foam::Pstream::master())
         {
-            LOGF << "maximum bounding raidus is " << m_radiusB << '\n';
+            LOGF << "maximum bounding radius is " << m_radiusB << '\n';
         }
 
         // read and create motions
@@ -141,7 +141,6 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         vector pos = solid.lookup("pos");
         if (m_ON_TWOD)
         {
-            // sanity check for 2d simulation: solid must have z = 0
             if (pos.z() !=  0)
                 Quit("Solid must has z=0 in 2D simulation, violated by solid # " + std::to_string(i));
         }
@@ -162,7 +161,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         if (mot_name!="free")
             s.setMotion(m_libmotion[mot_name]);
         s.setMaterialAndShape(m_libmat[mat_name], m_libshape[shp_name]);
-        this->addSolid(s);
+        this->addSolid(std::move(s));
 
         if (Foam::Pstream::master())
             LOGF << "Solid " << i << ":" << " motion = " << mot_name
@@ -199,7 +198,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         if (mot_name!="free")
             s.setMotion(m_libmotion[mot_name]);
         s.setMaterialAndShape(m_libmat[mat_name], m_libshape[shp_name]);
-        this->addPlane(s);
+        this->addPlane(std::move(s));
 
         if (Foam::Pstream::master())
             LOGF << "Plane " << i << ":" << " motion = " << mot_name
@@ -289,7 +288,7 @@ void SolidCloud::initialCorrect()
     }
 }
 
-void SolidCloud::fixInternal(const scalar& dt)
+void SolidCloud::fixInternal(scalar dt)
 {
     // after updating solid velocity, fix fluid velocity in cells fully covered by solid
     const Foam::vectorField& cc = m_mesh.C().internalField();
@@ -305,7 +304,7 @@ void SolidCloud::fixInternal(const scalar& dt)
     m_Uf.correctBoundaryConditions();
 }
 
-void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
+void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
 {
     m_geotools.clearCache();
     const Foam::vectorField& cc = m_mesh.cellCentres();
@@ -364,7 +363,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, const scalar& dt)
     solid.setFluidForceAndTorque(force, torque);
 }
 
-void SolidCloud::interact(const scalar& time, const scalar& dt)
+void SolidCloud::interact(scalar time, scalar dt)
 {
     // reset solid field, which are source terms for the fluid solver
     m_ct = 0;
@@ -447,22 +446,19 @@ void SolidCloud::solidSolidCollision(Solid& s1, Solid& s2)
 
     vector force, torque;
 
-    /* force law: f = f(cd, cN, material) */
-    // option 1
+    /* force law: f = f(cd, cN, material), subject to customization */
     {
         if (cd < 0) return;
         force  = 1e4*cd*cN;
         torque = vector::zero;
     }
 
-    // user can customize here
-
     // add collision force and torque to solids
     s1.addForceAndTorque(-force,-torque);
     s2.addForceAndTorque( force, torque);
 }
 
-void SolidCloud::evolve(const scalar& time, const scalar& dt)
+void SolidCloud::evolve(scalar time, scalar dt)
 {
     m_time = time;
     static label N_SUBITER = 20;
