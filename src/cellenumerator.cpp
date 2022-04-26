@@ -56,25 +56,17 @@ CellEnumerator::CellEnumerator(const Foam::fvMesh& mesh) : MeshInfo(mesh)
 void CellEnumerator::SetSolid(const Solid& solid)
 {
     std::fill(m_ct.begin(), m_ct.end(), UNVISITED);
-
     mp_solid = &solid;
 
     int seed = m_ms->findNearestCell(mp_solid->getCenter());
-    if (CountVertexInside(seed, *mp_solid) != m_c2p[seed].size())
-        seed = -1;
-
-    // fallback to the most costly option: scan all cells of current partition to find seed
     if (seed < 0)
     {
         forAll(m_cc, icell)
         {
-            if (mp_solid->isInside(m_cc[icell]))
+            if (seed > 0) break;
+            forAll(m_c2p[icell], ivert)
             {
-                int insideCount = 0;
-                // loop cell vertices
-                forAll(m_c2p[icell], ivert)
-                    insideCount += mp_solid->isInside(m_pp[m_c2p[icell][ivert]]);
-                if (insideCount == m_c2p[icell].size())
+                if (mp_solid->isInside(m_pp[m_c2p[icell][ivert]]))
                 {
                     seed = icell;
                     break;
@@ -86,9 +78,14 @@ void CellEnumerator::SetSolid(const Solid& solid)
     if (seed >= 0)
     {
         m_queue.push(seed);
-        m_ct[seed] = CELL_TYPE::ALL_INSIDE;
 
-        Foam::Info << "Solid " << solid.getID() <<  " has seed " << seed << '\n';
+        if (CountVertexInside(seed, *mp_solid) == m_c2p[seed].size())
+            m_ct[seed] = CELL_TYPE::ALL_INSIDE;
+        else
+            if (mp_solid->isInside(m_cc[seed]))
+                m_ct[seed] = CELL_TYPE::CENTER_INSIDE;
+            else
+                m_ct[seed] = CELL_TYPE::CENTER_OUTSIDE;
     }
 }
 

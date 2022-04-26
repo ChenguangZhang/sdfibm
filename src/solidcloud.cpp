@@ -348,13 +348,18 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
         m_cellenum.Next();
     }
 
-    Foam::Info << "#cell inside/border/all: " << numInsideCell << ' '
-               << numBorderCell << ' ' << m_mesh.V().size() << Foam::endl;
+    if (Foam::Pstream::parRun())
+    {
+        Foam::reduce(numInsideCell, Foam::sumOp<Foam::scalar>());
+        Foam::reduce(numBorderCell, Foam::sumOp<Foam::scalar>());
+    }
+
+    Foam::Info << "Solid " << solid.getID() << " has " << numInsideCell << '/'
+               << numBorderCell << " internal/boundary cells.\n";
 
     force  *= m_rhof;
     torque *= m_rhof;
 
-    // a solid may cover several partitions with each contributing some "partial" force
     if (Foam::Pstream::parRun())
     {
         Foam::reduce(force,  Foam::sumOp<Foam::vector>());
