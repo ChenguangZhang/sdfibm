@@ -16,7 +16,7 @@ INFLAGS+=-I$(FOAM_SRC)/dynamicFvMesh/lnInclude
 INFLAGS+=-I$(FOAM_SRC)/OSspecific/POSIX/lnInclude
 INFLAGS+=-I$(FOAM_SRC)/meshTools/lnInclude
 
-LIBMPI=-L$(FOAM_LIBBIN)/openmpi-system -lPstream
+LIBMPI=-L$(FOAM_LIBBIN)/$(FOAM_MPI) -lPstream
 
 LDFLAGS =-lm
 LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -lmeshTools
