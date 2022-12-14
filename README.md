@@ -1,27 +1,27 @@
 # sdfibm
-An immersed boundary method for simulating fluid-solid interaction and particle-laden multiphase flows.
+An immersed boundary method (IBM) implementation for simulating fluid-solid interaction and particle-laden multiphase flows.
 
 -----------
 
 # Installation
 Requirement: `g++` with `C++11` support and OpenFOAM v6. Other compilers weren't tested but should work.
 
-*Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM v6. Test afterwards to ensure a working installation (e.g., by running some serial and parallel tutorial cases).
+*Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM v6. **Test** to ensure a working installation (e.g., by running the cavity case in serial and parallel).
 
-*Step 2*, whether on your laptop or HPC cluster, simply type three commands.
+*Step 2*, whether on your laptop or HPC cluster, execute three commands:
 
 ```bash
 git clone https://github.com/ChenguangZhang/sdfibm.git
 cd sdfibm/src
 make
 ```
-The solver binary is `./src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm`), then you can simply type `sdfibm` to run a simulation without specifying the whole binary path.
+The last line compiles the solver binary `./src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in terminal without specifying its complete path.
+
 ## Important!
 
-- The convention of coordinate system is that we face the $x$-$y$ plane, with $z$-axis pointing towards us.
+- Coordinate system convention: your screen is the $x$-$y$ plane, with $z$-axis pointing at you.
 
-- A 2D simulation uses a one-cell-thick 3D mesh, `sdfibm` mandates that the "thickness direction" is in $z$ and the $z$-span of the mesh is $[-0.5,0.5]$. In other words, the 2D dynamics occurs exactly on the $z=0$, aka the $x$-$y$ plane. In addition, due to the different ways of handling the geometry, the `on_twod` option in `solidDict` must be set to 1.
-
+- For 2D simulation, create a one-cell thick 3D mesh. The "thickness direction" must be in $z$ and the $z$-span of the mesh must be $[-0.5,0.5]$. The reason is the computed force on the solid scales with the $z$-span. Set `on_twod` option in `solidDict` to 1.
 
 # Included examples
 Cases under the [example](./examples) folder are some good starting points of using the code. That include
