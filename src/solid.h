@@ -184,7 +184,7 @@ public:
         // position & orientation updated AFTER constraint
         center      += 0.5*(velocity + velocity_old)*dt;
         orientation += 0.5*quaternion(0.5*(omega + omega_old))*orientation*dt;
-        orientation.normalize(); // no need to normalize every step, but cheap anyway
+        orientation.normalise(); // no need to normalise every step, but cheap anyway
     }
 
     Solid(label solid_id,
