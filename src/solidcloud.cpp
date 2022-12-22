@@ -506,9 +506,6 @@ void SolidCloud::evolve(scalar time, scalar dt)
         }
         // NOW Fn = F_f
 
-        this->addMidEnvironment();
-        // NOW Fn = F_f + m*g
-
         for (Solid& solid : m_planes)
         {
             solid.move(time, dt);
