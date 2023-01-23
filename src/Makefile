@@ -19,7 +19,7 @@ INFLAGS+=-I$(FOAM_SRC)/meshTools/lnInclude
 LIBMPI=-L$(FOAM_LIBBIN)/$(FOAM_MPI) -lPstream
 
 LDFLAGS =-lm
-LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -ldynamicFvMesh -lmeshTools
+LDFLAGS+=-L$(FOAM_LIBBIN) -lfiniteVolume -lOpenFOAM -lmeshTools
 
 
 APPSOURCES=main.cpp solid.cpp solidcloud.cpp logger.cpp meshinfo.cpp cellenumerator.cpp geometrictools.cpp

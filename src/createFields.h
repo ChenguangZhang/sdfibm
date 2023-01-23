@@ -4,7 +4,7 @@ surfaceScalarField phi ( IOobject ( "phi", runTime.timeName(), mesh, IOobject::R
                          linearInterpolate(U) & mesh.Sf() );
 label  pRefCell  = 0;
 scalar pRefValue = 0;
-setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
+setRefCell(p, mesh.solution().dict().subDict("PISO"), pRefCell, pRefValue);
 
 IOdictionary transportProperties
 (

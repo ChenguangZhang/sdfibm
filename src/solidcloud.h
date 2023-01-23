@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "dimensionedScalar.H"
 #include "fvm.H"
 #include "types.h"
 #include "solid.h"
