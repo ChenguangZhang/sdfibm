@@ -32,5 +32,6 @@ ehthumbs.db
 Thumbs.db
 
 build
-src/.vscode
+.vscode
 .gitignore
+test_case

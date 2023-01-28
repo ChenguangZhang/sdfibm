@@ -15,16 +15,16 @@ int main(int argc, char *argv[])
     if(runTime.time().value() > 0)
     {
         if(!Foam::Pstream::parRun())
-            dictfile = "./" + mesh.time().timeName() + "/solidDict";
+            dictfile = mesh.time().timeName() + "/solidDict";
         else
-            dictfile = "./processor0/" + mesh.time().timeName() + "/solidDict";
+            dictfile = "processor0/" + mesh.time().timeName() + "/solidDict";
     }
     else
     {
         dictfile = "solidDict";
     }
 
-    sdfibm::SolidCloud solidcloud(dictfile, U, runTime.value());
+    sdfibm::SolidCloud solidcloud(args.path() + "/" + dictfile, U, runTime.value());
     solidcloud.saveState();  // write the initial condition
 
     while (runTime.loop())
