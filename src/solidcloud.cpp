@@ -131,7 +131,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
 
     // create solids
     if (Foam::Pstream::master())
-        LOGF << GenBanner("CREATE: SOLIDS & PLANES");
+        LOGF << GenBanner("CREATE: SOLIDS");
 
     const dictionary &solids = root.subDict("solids");
     forAll(solids, i)
@@ -167,43 +167,6 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
             LOGF << "Solid " << i << ":" << " motion = " << mot_name
                 << ", material = " << mat_name << ", shape = " << shp_name << "\n";
     }
-
-    const dictionary &planes = root.subDict("planes");
-    label i0 = m_solids.size();
-    forAll(planes, i)
-    {
-        const dictionary &plane = planes.subDict(planes.toc()[i]);
-
-        vector pos = plane.lookup("pos");
-        if (m_ON_TWOD)
-        {
-            // sanity check for 2d simulation: plane must have z = 0
-            if (pos.z() !=  0)
-                Quit("Plane must has z=0 in 2D simulation, violated by plane # " + std::to_string(i));
-        }
-        // create plane
-        Solid s(i + i0, pos, quaternion::I);
-        // read velocity, euler angle, angular velocity
-        vector vel = plane.lookupOrDefault("vel", vector::zero);
-        s.setVelocity(vel);
-        vector euler = plane.lookupOrDefault("euler", vector::zero);
-        s.setOrientation(euler*M_PI/180.0);
-        vector omega = plane.lookupOrDefault("omega", vector::zero);
-        s.setOmega(omega);
-
-        // add motion, material, and shape
-        std::string mot_name = Foam::word(plane.lookup("mot_name"));
-        std::string mat_name = Foam::word(plane.lookup("mat_name"));
-        std::string shp_name = Foam::word(plane.lookup("shp_name"));
-        if (mot_name!="free")
-            s.setMotion(m_libmotion[mot_name]);
-        s.setMaterialAndShape(m_libmat[mat_name], m_libshape[shp_name]);
-        this->addPlane(std::move(s));
-
-        if (Foam::Pstream::master())
-            LOGF << "Plane " << i << ":" << " motion = " << mot_name
-                << ", material = " << mat_name << ", shape = " << shp_name << "\n";
-    }
     m_solidDict = root;
 }
 
@@ -222,7 +185,6 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scal
     m_timeStepCounter = 0;
     m_writeFrequency = 1;
     m_solids.reserve(10);
-    m_planes.reserve(10);
 
     collision_pairs.reserve(100);
     m_ptr_ugrid = nullptr;
@@ -235,7 +197,7 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scal
     initFromDictionary(Foam::word(dictfile));
     if (Foam::Pstream::master())
     {
-        LOGF << "Totally [" << m_solids.size() << "] solids and [" << m_planes.size() << "] planes.\n";
+        LOGF << "Totally [" << m_solids.size() << "] solids.\n";
     }
 
     // create bounding box
@@ -381,9 +343,6 @@ void SolidCloud::interact(scalar time, scalar dt)
     for (Solid& solid : m_solids)
         solidFluidInteract(solid, dt);
 
-    for (Solid& solid : m_planes)
-        solidFluidInteract(solid, dt);
-
     checkAlpha();
 
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
@@ -405,7 +364,7 @@ void SolidCloud::interact(scalar time, scalar dt)
 
 void SolidCloud::addMidEnvironment()
 {
-    // add env effect (like gravity) at time = t + dt/2 (only to solid, not to plane)
+    // add env effect (like gravity) at time = t + dt/2
     for (Solid& solid : m_solids)
     {
         scalar rhos = solid.getMaterial()->getRho();
@@ -416,7 +375,6 @@ void SolidCloud::addMidEnvironment()
 
 void SolidCloud::solidSolidInteract()
 {
-    // solid versus solid
     m_ptr_ugrid->clear();
     for (const Solid& s : m_solids)
     {
@@ -428,11 +386,6 @@ void SolidCloud::solidSolidInteract()
     m_ptr_ugrid->generateCollisionPairs(pairs);
     for (CollisionPair& pair : pairs)
         solidSolidCollision(m_solids[pair.first], m_solids[pair.second]);
-
-    // plane versus solid
-    for (Solid& p: m_planes)
-        for (Solid& s: m_solids)
-            solidSolidCollision(p, s);
 }
 
 
@@ -494,23 +447,7 @@ void SolidCloud::evolve(scalar time, scalar dt)
         }
     }
 
-    {
-        // clean all forces
-        for (Solid& solid : m_planes)
-            solid.clearForceAndTorque();
-        // NOW Fn = 0.0
-
-        for (Solid& solid : m_planes)
-        {
-            solid.addMidFluidForceAndTorque();
-        }
-        // NOW Fn = F_f
-
-        for (Solid& solid : m_planes)
-        {
-            solid.move(time, dt);
-        }
-    }
+    // appear plane has no env force and no solid-solid interactoin TODO
 
     for (Solid& solid : m_solids)
         solid.storeOldFluidForce();
@@ -555,20 +492,10 @@ std::ostream& operator<<(std::ostream& os, const SolidCloud& sc)
             write2D(os, solid);
             os << '\n';
         }
-
-        for (const Solid& solid : sc.m_planes)
-        {
-            os << sc.m_time << ' ';
-            write2D(os, solid);
-            os << '\n';
-        }
     }
     else
     {
         for (const Solid& solid : sc.m_solids)
-            os << sc.m_time << ' ' << solid << '\n';
-
-        for (const Solid& solid : sc.m_planes)
             os << sc.m_time << ' ' << solid << '\n';
     }
     return os;

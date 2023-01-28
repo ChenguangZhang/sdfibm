@@ -40,7 +40,6 @@ private:
 
 private:
     std::vector<Solid> m_solids; // finite solids
-    std::vector<Solid> m_planes; // infinite planes (also solids)
     dictionary m_solidDict;
 
     // collision handling
@@ -83,7 +82,6 @@ public:
 
     // setup
     inline void addSolid(Solid&& solid) { m_solids.emplace_back(solid); }
-    inline void addPlane(Solid&& solid) { m_planes.emplace_back(solid); }
     void addBoundingBox(const BBox& particle_bbox);
 
     // io

@@ -9,7 +9,7 @@
 #include "../types.h"
 typedef std::pair<int, int> CollisionPair;
 
-namespace sdfibm{
+namespace sdfibm {
 
 class UGrid
 {

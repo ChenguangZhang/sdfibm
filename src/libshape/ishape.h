@@ -35,24 +35,23 @@ public:
 public:
     IShape()
     {
-        m_radiusB   = 0.0; // bounding raidus
-        m_volume    = 0.0; // volume
+        m_radiusB   = 0.0;
+        m_volume    = 0.0;
         m_volumeINV = 0.0;
-        m_com = vector(0, 0, 0); // center of mass
+        m_com       = vector(0.0, 0.0, 0.0);
 
-        m_moi    = tensor(0, 0, 0, 0, 0, 0, 0, 0, 0);
-        m_moiINV = tensor(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        m_moi    = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        m_moiINV = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
     SHAPETYPENAME("IShape");
 
-    virtual int  getShapeID() const {return m_id;}
+    virtual int    getShapeID() const {return m_id;}
     virtual scalar getRadiusB() const {return m_radiusB;}
 
-    // Functions below shall be overwritten by children implementation
-    virtual bool isInside(const vector& p) const = 0;
-    virtual scalar signedDistance(const vector& p) const = 0;
-    virtual std::string description() const = 0;
+    virtual bool        isInside      (const vector& p) const = 0;
+    virtual scalar      signedDistance(const vector& p) const = 0;
+    virtual std::string description   ()                const = 0;
 
     virtual ~IShape(){}
 };
