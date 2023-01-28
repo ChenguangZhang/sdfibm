@@ -31,6 +31,6 @@ sdfibm
 ehthumbs.db
 Thumbs.db
 
+build
 src/.vscode
-src/.vscode/settings.json
 .gitignore

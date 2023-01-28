@@ -1,7 +1,7 @@
                     GNU GENERAL PUBLIC LICENSE
 
  SDFIBM is Copyright (C) 2018 Chenguang Zhang
- Contact: Chenguang Zhang, cgzhang@mit.edu
+ Contact: Chenguang Zhang, hi.chenguang@gmail.com
 
  You may use, distribute and copy the software under the terms of GNU General
  Public License v3 (displayed below) or any later version.
