@@ -31,6 +31,7 @@ public:
     scalar m_volume, m_volumeINV; // volume
     vector m_com;                 // center of mass
     tensor m_moi, m_moiINV;       // moi in principal frame (nonzero only along diagonal)
+    bool finite;
 
 public:
     IShape()
@@ -42,6 +43,8 @@ public:
 
         m_moi    = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         m_moiINV = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        finite = true;
     }
 
     SHAPETYPENAME("IShape");

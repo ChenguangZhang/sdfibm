@@ -7,12 +7,10 @@ namespace sdfibm {
 class Plane : public IShape, _shapecreator<Plane>
 {
 private:
-    scalar m_radius;
-    scalar m_radiusSQR;
 
 public:
     // const static int shape_id = SHAPE::CIRC;
-    Plane(const dictionary& para) {}
+    Plane(const dictionary& para) {finite = false;}
 
     // typename and description
     SHAPETYPENAME("Plane")
