@@ -2,7 +2,6 @@
 #define SOLID_H_INCLUDED
 
 #include "types.h"
-//#include "./libshape/vof.h"
 #include "./libshape/ishape.h"
 #include "./libmotion/imotion.h"
 #include "./libmaterial/imaterial.h"
@@ -78,16 +77,13 @@ public:
     inline IShape*    getShape()    const {return ptr_shape;   }
     inline IMaterial* getMaterial() const {return ptr_material;}
     inline scalar     getRadiusB()  const {return ptr_shape->getRadiusB();}
+    inline bool       isFinite()    const {return ptr_shape->finite;}
 
-    // done getters and setters
-    // set solid material and shape
-    inline void setMaterialAndShape(IMaterial* material,
-                                    IShape*    shape)
+    inline void setShape(IShape* shape) { ptr_shape = shape; }
+    inline void setMaterial(IMaterial* material)
     {
         ptr_material = material;
-        ptr_shape    = shape;
 
-        // update composite properties
         scalar rho = ptr_material->getRho();
         mass     = ptr_shape->m_volume    * rho;
         mass_inv = ptr_shape->m_volumeINV / rho;
@@ -199,8 +195,8 @@ public:
         force    = vector::zero;
         torque   = vector::zero;
 
-        fluid_force  = vector::zero;
-        fluid_torque = vector::zero;
+        fluid_force      = vector::zero;
+        fluid_torque     = vector::zero;
         fluid_force_old  = vector::zero;
         fluid_torque_old = vector::zero;
 

@@ -37,6 +37,7 @@ private:
     unsigned int m_timeStepCounter;
     unsigned int m_writeFrequency;
     scalar m_time;
+    std::string m_sampler;
 
 private:
     std::vector<Solid> m_solids; // finite solids
@@ -75,6 +76,8 @@ private:
 
     void solidFluidInteract(Solid& s, scalar dt);
     void solidFluidCorrect (Solid& s, scalar dt);
+    template<class Type>
+    Type calcMeanField(Solid& s, IShape* shape, const Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>& field);
 
 public:
     SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scalar time);
@@ -99,6 +102,7 @@ public:
     // time stepping
     void storeOld();
     void restoreOld();
+    void writeMeanField(std::ostream& of);
     void evolve  (scalar time, scalar dt);
     void interact(scalar time, scalar dt);
     void addMidEnvironment();

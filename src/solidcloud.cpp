@@ -26,6 +26,7 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
     m_ON_TWOD  = Foam::readBool(meta.lookup("on_twod"));
     m_gravity  = meta.lookup("gravity");
     m_writeFrequency = meta.lookupOrDefault("writeFrequency", 1);
+    meta.found("sampler") ? m_sampler = Foam::word(meta.lookup("sampler")) : "";
 
     // log meta information
     if (Foam::Pstream::master())
@@ -160,7 +161,8 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         std::string shp_name = Foam::word(solid.lookup("shp_name"));
         if (mot_name!="free")
             s.setMotion(m_libmotion[mot_name]);
-        s.setMaterialAndShape(m_libmat[mat_name], m_libshape[shp_name]);
+        s.setShape(m_libshape[shp_name]);
+        s.setMaterial(m_libmat[mat_name]);
         this->addSolid(std::move(s));
 
         if (Foam::Pstream::master())
@@ -190,15 +192,15 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scal
     m_ptr_ugrid = nullptr;
     InitCollisionFuncTable();
 
-    // open output file, overwrite if file exists
-    statefile.open("cloud.out", std::fstream::out);
-    statefile << std::scientific;
-
     initFromDictionary(Foam::word(dictfile));
     if (Foam::Pstream::master())
     {
         LOGF << "Totally [" << m_solids.size() << "] solids.\n";
     }
+
+    // open output file, overwrite if file exists
+    statefile.open("cloud.out", std::fstream::out);
+    statefile << std::scientific;
 
     // create bounding box
     Foam::vector low  = m_mesh.bounds().min();
@@ -265,6 +267,61 @@ void SolidCloud::fixInternal(scalar dt)
     }
     m_Uf.correctBoundaryConditions();
 }
+
+void SolidCloud::writeMeanField(std::ostream& of)
+{
+    if (m_sampler == "")
+        return;
+    for (Solid& solid : m_solids)
+    {
+        vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler], m_Uf);
+        of << vMean.x() << ' ' << vMean.y() << ' ' << vMean.z() << ' ';
+    }
+    of << '\n';
+}
+
+template<class Type>
+Type SolidCloud::calcMeanField(Solid& solid, IShape* shape, const Foam::GeometricField<Type, Foam::fvPatchField, Foam::volMesh>& field)
+{
+    Solid tmpSolid = solid;
+    tmpSolid.setShape(shape);
+
+    m_geotools.clearCache();
+    const Foam::scalarField& cv = m_mesh.V();
+
+    Type meanField  = vector::zero;
+    scalar volume = 0.0;
+
+    m_cellenum.SetSolid(tmpSolid);
+    int insideType = tmpSolid.getID() + 4;
+    scalar alpha = 0.0;
+    while (!m_cellenum.Empty())
+    {
+        int icur = m_cellenum.GetCurCellInd();
+        if (m_cellenum.GetCurCellType() == CellEnumerator::ALL_INSIDE)
+        {
+            alpha = 1.0;
+            m_ct[icur] = insideType;
+        }
+        else
+        {
+            m_ct[icur] = m_cellenum.GetCurCellType();
+            alpha = m_geotools.calcCellVolume(icur, tmpSolid, m_ON_TWOD)/cv[icur];
+        }
+        scalar dV = alpha*cv[icur];
+        volume    += dV;
+        meanField += dV*field[icur];
+        m_cellenum.Next();
+    }
+
+    if (Foam::Pstream::parRun())
+    {
+        Foam::reduce(meanField, Foam::sumOp<Type>());
+        Foam::reduce(volume, Foam::sumOp<Foam::scalar>());
+    }
+    return meanField/volume;
+}
+
 
 void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
 {
