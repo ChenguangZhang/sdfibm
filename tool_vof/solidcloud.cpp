@@ -106,32 +106,6 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, const Foam::fvMesh& mesh):
             logfile << "Solid " << i << " shape = " << shp_name << "\n";
     }
 
-    const dictionary &planes = root.subDict("planes");
-    forAll(planes, i)
-    {
-        const dictionary &plane = planes.subDict(planes.toc()[i]);
-
-        vector pos = plane.lookup("pos");
-        if (m_ON_TWOD)
-        {
-            // sanity check for 2d simulation: plane must have z = 0
-            if(pos.z() !=  0)
-                Quit("Plane must has z=0 in 2D simulation, violated by plane # " + std::to_string(i));
-        }
-        // create plane
-        Solid s(i, pos, quaternion::I);
-        // read velocity, euler angle, angular velocity
-        vector euler = plane.lookupOrDefault("euler", vector::zero);
-        s.setOrientation(euler*M_PI/180.0);
-
-        std::string shp_name = Foam::word(plane.lookup("shp_name"));
-        s.setMaterialAndShape(m_libmat["mat"], m_libshape[shp_name]);
-        this->addPlane(s);
-
-        if(Foam::Pstream::master())
-            logfile << "Plane " << i << " shape = " << shp_name << "\n";
-    }
-
     if(Foam::Pstream::master())
     {
         logfile << "Totally [" << m_solids.size() << "] solids and [" << m_planes.size() << "] planes.\n";
