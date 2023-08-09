@@ -4,18 +4,20 @@ An immersed boundary method (IBM) implementation for simulating fluid-solid inte
 -----------
 
 # Installation
-Requirement: `g++` with `C++11` support and OpenFOAM v6. Other compilers weren't tested but should work.
+Requirement: `g++` with `C++17` support and OpenFOAM v9. Other compilers weren't tested, and may or may not work. As of 08/08/2023, I switched to CMake, meaning CMake must be
+available as well.
 
-*Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM v6. **Test** to ensure a working installation (e.g., by running the cavity case in serial and parallel).
-
+*Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM. **Test** by running the cavity case in both serial and parallel mode to ensure a working installation.
 *Step 2*, whether on your laptop or HPC cluster, execute three commands:
-
 ```bash
 git clone https://github.com/ChenguangZhang/sdfibm.git
 cd sdfibm/src
+mkdir build
+cd build
+cmake ..
 make
 ```
-The last line compiles the solver binary `./src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s ~/sdfibm/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in terminal without specifying its complete path.
+The compiled solver binary is located at `build/src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s <path-to-sdfibm>/build/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in terminal without specifying its complete path.
 
 ## Important!
 
