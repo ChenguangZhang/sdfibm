@@ -1,8 +1,6 @@
 #include "fvCFD.H"
 #include "solidcloud.h"
 
-#define MEAN_FIELD 1
-
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
@@ -25,9 +23,6 @@ int main(int argc, char *argv[])
     {
         dictfile = "solidDict";
     }
-#ifdef MEAN_FIELD
-    std::ofstream meanFieldFile("meanField.dat", std::ios::app);
-#endif
 
     sdfibm::SolidCloud solidcloud(args.path() + "/" + dictfile, U, runTime.value());
     solidcloud.saveState();  // write the initial condition
@@ -61,10 +56,6 @@ int main(int argc, char *argv[])
             TEqn.solve();
         }
 
-#ifdef MEAN_FIELD
-        if (Foam::Pstream::master())
-            solidcloud.writeMeanField(meanFieldFile);
-#endif
 
         solidcloud.interact(runTime.value(), dt.value());
 

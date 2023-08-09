@@ -24,6 +24,13 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
     const dictionary& meta = root.subDict("meta");
     m_ON_FLUID = Foam::readBool(meta.lookup("on_fluid"));
     m_ON_TWOD  = Foam::readBool(meta.lookup("on_twod"));
+    if (meta.found("on_meanfield"))
+    {
+        m_ON_MEANFIELD = true;
+        meanFieldFile.open("meanfield.out", std::fstream::out);
+        meanFieldFile << std::scientific;
+    }
+
     m_gravity  = meta.lookup("gravity");
     m_writeFrequency = meta.lookupOrDefault("writeFrequency", 1);
     meta.found("sampler") ? m_sampler = Foam::word(meta.lookup("sampler")) : "";
@@ -268,16 +275,16 @@ void SolidCloud::fixInternal(scalar dt)
     m_Uf.correctBoundaryConditions();
 }
 
-void SolidCloud::writeMeanField(std::ostream& of)
+void SolidCloud::writeMeanField()
 {
     if (m_sampler == "")
         return;
     for (Solid& solid : m_solids)
     {
         vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler], m_Uf);
-        of << vMean.x() << ' ' << vMean.y() << ' ' << vMean.z() << ' ';
+        meanFieldFile << vMean.x() << ' ' << vMean.y() << ' ' << vMean.z() << ' ';
     }
-    of << '\n';
+    meanFieldFile << '\n';
 }
 
 template<class Type>
@@ -532,6 +539,10 @@ void SolidCloud::saveState()
         {
             statefile << (*this);
             statefile.flush();
+        }
+        if (m_ON_MEANFIELD)
+        {
+            this->writeMeanField();
         }
         ++m_timeStepCounter;
     }

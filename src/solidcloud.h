@@ -24,34 +24,30 @@ namespace sdfibm {
 
 class SolidCloud
 {
-    // disallow copy constructor and assignment operator
-    SolidCloud (const SolidCloud&) = delete;
-    SolidCloud& operator=(const SolidCloud&) = delete;
-
 private:
-    bool m_ON_FLUID; // is fsi?
-    bool m_ON_TWOD;  // is 2-d?
+    bool m_ON_FLUID;
+    bool m_ON_TWOD;
     bool m_ON_VOFONLY;
     bool m_ON_RESTART;
+    bool m_ON_MEANFIELD {false};
 
     unsigned int m_timeStepCounter;
     unsigned int m_writeFrequency;
     scalar m_time;
     std::string m_sampler;
 
-private:
-    std::vector<Solid> m_solids; // finite solids
+    std::vector<Solid> m_solids;
     dictionary m_solidDict;
 
     // collision handling
     BBox* m_ptr_bbox;
     UGrid* m_ptr_ugrid;
     std::vector<CollisionPair> collision_pairs;
-    scalar m_radiusB; // max bounding radius of shapes
+    scalar m_radiusB;
 
     // environmental info
     vector m_gravity;
-    scalar m_rhof; // fluid density
+    scalar m_rhof;
 
     // variables on mesh
     const Foam::fvMesh&   m_mesh;
@@ -68,8 +64,8 @@ private:
     std::map<std::string, IMaterial*> m_libmat;
     std::map<std::string, IShape*   > m_libshape;
     std::ofstream statefile;
+    std::ofstream meanFieldFile;
 
-private:
     void solidSolidInteract();
     void solidSolidCollision(Solid& s1, Solid& s2);
     void resolveCollisionPairs();
@@ -102,7 +98,7 @@ public:
     // time stepping
     void storeOld();
     void restoreOld();
-    void writeMeanField(std::ostream& of);
+    void writeMeanField();
     void evolve  (scalar time, scalar dt);
     void interact(scalar time, scalar dt);
     void addMidEnvironment();
@@ -110,6 +106,10 @@ public:
     void initialCorrect();
 
     friend std::ostream& operator<<(std::ostream& os, const SolidCloud& sc);
+    
+    // deleted methods
+    SolidCloud (const SolidCloud&) = delete;
+    SolidCloud& operator=(const SolidCloud&) = delete;
 };
 
 }
