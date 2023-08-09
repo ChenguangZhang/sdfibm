@@ -4,11 +4,16 @@ An immersed boundary method (IBM) implementation for simulating fluid-solid inte
 -----------
 
 # Installation
-Requirement: `g++` with `C++17` support and OpenFOAM v9. Other compilers weren't tested, and may or may not work. As of 08/08/2023, I switched to CMake, meaning CMake must be
-available as well.
+Requirement:
+- `g++` with `C++17` 
+- OpenFOAM v9
+- CMake (changed on 08/08/2023)
+
+Other compilers weren't tested, and they may work or not.
 
 *Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM. **Test** by running the cavity case in both serial and parallel mode to ensure a working installation.
-*Step 2*, whether on your laptop or HPC cluster, execute three commands:
+
+*Step 2*, just follow the typical CMake workflow
 ```bash
 git clone https://github.com/ChenguangZhang/sdfibm.git
 cd sdfibm/src
@@ -17,7 +22,7 @@ cd build
 cmake ..
 make
 ```
-The compiled solver binary is located at `build/src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s <path-to-sdfibm>/build/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in terminal without specifying its complete path.
+That's it. The compiled solver binary is now located at `build/src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s <path-to-sdfibm>/build/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in any terminal without specifying its complete path.
 
 ## Important!
 
@@ -105,12 +110,15 @@ Cheers.
 - `main.cpp` implements the projection method and the direct forcing IBM
 
 # Output file
-Information of the solid bodies is written to the `cloud.out` file, which has the simple plain text format: if there are $m$ solids and $n$ planes, each time step `sdfibm` writes $m+n$ lines, and each line contains 19 columns.
+The solid data (position, velocity, force, etc.) is written to the plain text `cloud.out` file. If there are $m$ solids, each time step `sdfibm` writes $m$ lines, and each line contains 19 columns in 3D, or 10 columes in 2D.
 
-> names = ["t", "x", "y", "z", "vx", "vy", "vz", "fx", "fy", "fz", "EulerAx", "EulerAy", "EulerAz", "wx", "wy", "wz", "Tx", "Ty", "Tz"]
+> ["t", "x", "y", "z", "vx", "vy", "vz", "fx", "fy", "fz", "EulerAx", "EulerAy", "EulerAz", "wx", "wy", "wz", "Tx", "Ty", "Tz"]
 
 In words, they are:  
 > Time, position-x, position-x, position-z, velocity-x, velocity-y, velocity-z, force-x, force-y, force-z, Euler_angle-x, Euler_angle-y, Euler_angle-z, angular_velocity-x, angular_velocity-y, angular_velocity-z, torque-x, torque-y, torque-z
+
+In 2D, the columns are:
+> ["t", "x", "y", "vx", "vy", "fx", "fy", "EulerAz", "wz", "Tz"]
 
 
 # How to cite
