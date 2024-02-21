@@ -49,17 +49,8 @@ motions
     motion1
     {
        name free1;
-       type Motion111111;
-    }
-    motion2
-    {
-      name static1;
-      type Motion000000;
-    }
-    motion3
-    {
-      name onlyzrot1;
-      type Motion000001;
+       type Motion01Mask;
+       mask b111111;
     }
 }
 
@@ -76,4 +67,3 @@ solids
     }
 }
 
-planes {}
