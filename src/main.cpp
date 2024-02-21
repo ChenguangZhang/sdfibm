@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
         dictfile = "solidDict";
     }
 
-    sdfibm::SolidCloud solidcloud(args.path() + "/" + dictfile, U, runTime.value());
+    sdfibm::SolidCloud solidcloud(runTime.globalPath() + "/" + dictfile, U, runTime.value());
     solidcloud.saveState();  // write the initial condition
 
     while (runTime.loop())
