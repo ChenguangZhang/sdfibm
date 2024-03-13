@@ -39,8 +39,8 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
     if (Foam::Pstream::master())
     {
         std::ostringstream msg;
-        string dim = m_ON_TWOD ? "2D" : "3D";
-        string type = m_ON_FLUID? "FSI": "DEM (fluid disabled)";
+        std::string dim = m_ON_TWOD ? "2D" : "3D";
+        std::string type = m_ON_FLUID? "FSI": "DEM (fluid disabled)";
 
         msg << "Summary: "
             << dim << ' ' 

@@ -9,7 +9,6 @@
 
 namespace sdfibm {
 
-using std::string;
 using Foam::label;
 using Foam::scalar;
 using Foam::vector;

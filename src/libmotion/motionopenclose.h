@@ -19,7 +19,7 @@ public:
     }
     virtual ~MotionOpenClose() override final {}
     TYPENAME("MotionOpenClose")
-    virtual string description() const override {return "model the open-close operation of a gate";}
+    virtual std::string description() const override {return "model the open-close operation of a gate";}
 private:
     scalar getOpenCloseVelocity(const scalar& time)
     {

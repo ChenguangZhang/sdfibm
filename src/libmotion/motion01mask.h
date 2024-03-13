@@ -16,7 +16,7 @@ public:
     // update below
     virtual ~Motion01Mask() override final {}
     TYPENAME("Motion01Mask")
-    virtual string description() const override {return "general (0|1){6} motion mask";}
+    virtual std::string description() const override {return "general (0|1){6} motion mask";}
 
     Motion01Mask(const dictionary& para)
     {

@@ -7,7 +7,7 @@ namespace sdfibm{
 #define REGISTERMOTION(m) \
     bool sdfibm::m::added = MotionFactory::add(sdfibm::m::typeName(), sdfibm::m::create);
 
-bool MotionFactory::add(const string& name, TCreateMethod create_method)
+bool MotionFactory::add(const std::string& name, TCreateMethod create_method)
 {
     auto it = m_methods.find(name);
     // std::cout << "Registering..." << name << std::endl;
@@ -19,7 +19,7 @@ bool MotionFactory::add(const string& name, TCreateMethod create_method)
     return false;
 }
 
-IMotion* MotionFactory::create(const string& name, const dictionary& node)
+IMotion* MotionFactory::create(const std::string& name, const dictionary& node)
 {
     auto it = m_methods.find(name);
     if(it != m_methods.end())
@@ -29,7 +29,7 @@ IMotion* MotionFactory::create(const string& name, const dictionary& node)
     return nullptr;
 }
 
-std::map<string, MotionFactory::TCreateMethod> MotionFactory::m_methods;
+std::map<std::string, MotionFactory::TCreateMethod> MotionFactory::m_methods;
 
 }
 // add motions

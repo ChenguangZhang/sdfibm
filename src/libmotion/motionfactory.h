@@ -17,8 +17,8 @@ public:
     // ideally should be a singleton (TODO?), for now just disable ctor
     MotionFactory() = delete;
 
-    static bool add(const string& name, TCreateMethod create_method);
-    static IMotion* create(const string& name, const dictionary&);
+    static bool add(const std::string& name, TCreateMethod create_method);
+    static IMotion* create(const std::string& name, const dictionary&);
 
     static void report(std::ostream& os = std::cout)
     {
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    static std::map<string, TCreateMethod> m_methods;
+    static std::map<std::string, TCreateMethod> m_methods;
 };
 
 }

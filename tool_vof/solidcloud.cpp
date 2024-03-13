@@ -34,7 +34,7 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, const Foam::fvMesh& mesh):
     if(Foam::Pstream::master())
     {
         logfile << GenBanner("SUMMARY");
-        string dim = m_ON_TWOD ? "2D" : "3D";
+        std::string dim = m_ON_TWOD ? "2D" : "3D";
         logfile << "Binary was compiled at " << __DATE__ << ' ' << __TIME__ << '\n';
         logfile << "Simulation starts   at " << GetTimeString() << '\n';
     }

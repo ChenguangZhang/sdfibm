@@ -27,7 +27,7 @@ public:
     }
     virtual ~Motion000002() override final {}
     TYPENAME("Motion000002") // a linear motion
-    virtual string description() const override {return "only rotate in z with prescribed omega";}
+    virtual std::string description() const override {return "only rotate in z with prescribed omega";}
 private:
     scalar m_period, m_omega; // m_omegaz is only the z component
 };

@@ -27,7 +27,7 @@ public:
     }
     virtual ~Motion222000() override final {}
     TYPENAME("Motion222000") // a linear motion
-    virtual string description() const override {return "move at prescribed (u,v,w), no rotation";}
+    virtual std::string description() const override {return "move at prescribed (u,v,w), no rotation";}
 private:
     scalar m_u, m_v, m_w;
 };

@@ -8,7 +8,7 @@ namespace sdfibm {
 class MeshInfo
 {
 protected:
-    const Foam::fvMesh& m_mesh; // cell to cell connectivity
+    const Foam::fvMesh& m_mesh;
     const Foam::labelListList& m_c2c; // cell to cell connectivity
     const Foam::labelListList& m_c2p; // cell to point connectivity
     const Foam::pointField   & m_pp; // mesh points

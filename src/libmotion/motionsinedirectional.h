@@ -33,7 +33,7 @@ public:
     }
     virtual ~MotionSineDirectional() override final {}
     TYPENAME("MotionSineDirectional") // a linear motion
-    virtual string description() const override {return "oscillate as vec(x) = vec(x0) + a*sin(omega t)*vec(n), no rotation";}
+    virtual std::string description() const override {return "oscillate as vec(x) = vec(x0) + a*sin(omega t)*vec(n), no rotation";}
 private:
     scalar m_amplitude, m_period;
     vector m_direction;

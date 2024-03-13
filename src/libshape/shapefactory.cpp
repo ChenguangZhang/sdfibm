@@ -7,7 +7,7 @@ namespace sdfibm{
 #define REGISTERSHAPE(m) \
     bool sdfibm::m::added = ShapeFactory::add(sdfibm::m::typeName(), sdfibm::m::create);
 
-bool ShapeFactory::add(const string& name, TCreateMethod create_method)
+bool ShapeFactory::add(const std::string& name, TCreateMethod create_method)
 {
     auto it = m_methods.find(name);
     // std::cout << "Registering..." << name << std::endl;
@@ -19,7 +19,7 @@ bool ShapeFactory::add(const string& name, TCreateMethod create_method)
     return false;
 }
 
-IShape* ShapeFactory::create(const string& name, const dictionary& para)
+IShape* ShapeFactory::create(const std::string& name, const dictionary& para)
 {
     auto it = m_methods.find(name);
     if(it != m_methods.end())
@@ -29,7 +29,7 @@ IShape* ShapeFactory::create(const string& name, const dictionary& para)
     return nullptr;
 }
 
-std::map<string, ShapeFactory::TCreateMethod> ShapeFactory::m_methods;
+std::map<std::string, ShapeFactory::TCreateMethod> ShapeFactory::m_methods;
 
 }
 

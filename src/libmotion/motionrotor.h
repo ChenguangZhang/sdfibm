@@ -30,7 +30,7 @@ public:
     }
     virtual ~MotionRotor() override final {}
     TYPENAME("MotionRotor")
-    virtual string description() const override {return "rotate around origin with prescribed omega";}
+    virtual std::string description() const override {return "rotate around origin with prescribed omega";}
 private:
     scalar m_period, m_omega;
     scalar m_radius, m_theta0;
