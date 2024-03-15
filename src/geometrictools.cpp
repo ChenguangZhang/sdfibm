@@ -6,7 +6,7 @@ namespace sdfibm {
 scalar GeometricTools::UpdateCache(label vertexInd, const Solid& solid)
 {
     if (phiCache.find(vertexInd) == phiCache.end())
-        phiCache[vertexInd] = solid.signedDistance(m_pp[vertexInd]);
+        phiCache[vertexInd] = solid.phi(m_pp[vertexInd]);
     return phiCache[vertexInd];
 }
 

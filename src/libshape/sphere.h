@@ -2,7 +2,7 @@
 #define SPHERE_H
 
 #include "ishape.h"
-namespace sdfibm{
+namespace sdfibm {
 
 class Sphere : public IShape, _shapecreator<Sphere>
 {

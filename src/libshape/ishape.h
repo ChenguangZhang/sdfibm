@@ -26,6 +26,7 @@ public:
 class IShape
 {
 public:
+    struct Transformation {const quaternion& q; const vector& t;};
     const static int m_id = -1;
     scalar m_radiusB;             // radius of bounding sphere
     scalar m_volume, m_volumeINV; // volume
@@ -48,15 +49,25 @@ public:
     }
 
     SHAPETYPENAME("IShape");
+    
+    inline vector world2local(const vector& p, const Transformation& tr) const
+    {
+        return Foam::conjugate(tr.q).transform(p - tr.t);
+    }
 
     virtual int    getShapeID() const {return m_id;}
     virtual scalar getRadiusB() const {return m_radiusB;}
 
-    virtual bool        isInside      (const vector& p) const = 0;
-    virtual scalar      signedDistance(const vector& p) const = 0;
+    virtual bool phi01(const vector& p, const Transformation& tr) { return isInside      (world2local(p, tr)); }
+    virtual scalar phi(const vector& p, const Transformation& tr) { return signedDistance(world2local(p, tr)); }
+
     virtual std::string description   ()                const = 0;
 
     virtual ~IShape(){}
+
+private:
+    virtual bool   isInside      (const vector& p) const = 0; // local coordinate
+    virtual scalar signedDistance(const vector& p) const = 0; // local coordinate
 };
 
 }

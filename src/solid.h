@@ -94,34 +94,16 @@ public:
     inline void setMotion(IMotion* solid_motion) { ptr_motion = solid_motion; }
     inline void unsetMotion()                    { ptr_motion = nullptr; }
 
-    /* Check if point p is inside the solid
-     *
-     * 20/02/2021 All geometric calculations are delegated to shape component of the solid. Before
-     * that however, the solid should transfer form the point to the object space of its shape component.
-     * TODO: for circle/sphere shapes, the quaternion transformation can be omitted.
-     *
-     * @param p World coordinate of a point (e.g., a mesh vertex or cell center
-     * @return true if point inside solid, false if outside of the solid
-     */
-    inline bool isInside(const vector& p) const
+    // true if the point is inside solid, false otherwise
+    inline bool phi01(const vector& p) const
     {
-        return ptr_shape->isInside(
-            Foam::conjugate(orientation).transform(p - center)
-        );
+        return ptr_shape->phi01(p, {orientation, center});
     }
 
-    /* Find point p's sdf w.r.t. the solid
-     *
-     * Note: see that of isInside function
-     *
-     * @param p World coordinate of a point (e.g., a mesh vertex or cell center
-     * @return phi the sdf of the point
-     */
-    inline scalar signedDistance(const vector& p) const
+    // sdf at point, negative if inside
+    inline scalar phi(const vector& p) const
     {
-        return ptr_shape->signedDistance(
-            Foam::conjugate(orientation).transform(p - center)
-        );
+        return ptr_shape->phi(p, {orientation, center});
     }
 
     inline vector evalPointVelocity(const vector& p) const

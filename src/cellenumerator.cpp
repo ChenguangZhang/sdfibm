@@ -23,7 +23,7 @@ void CellEnumerator::_next()
             m_queue.push(inb);
             if (n_v_inside == m_c2p[icur].size())
                 m_ct[inb] = CELL_TYPE::ALL_INSIDE;
-            else if (mp_solid->isInside(m_cc[inb]))
+            else if (mp_solid->phi01(m_cc[inb]))
                 m_ct[inb] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[inb] = CELL_TYPE::CENTER_OUTSIDE;
@@ -42,7 +42,7 @@ int CellEnumerator::CountVertexInside(int icell, const Solid& solid) const
     {
         int ivert = m_c2p[icell][_];
         const vector& p = m_pp[ivert];
-        n_v_inside += solid.isInside(p);
+        n_v_inside += solid.phi01(p);
     }
     return n_v_inside;
 }
@@ -66,7 +66,7 @@ void CellEnumerator::SetSolid(const Solid& solid)
             if (seed > 0) break;
             forAll(m_c2p[icell], ivert)
             {
-                if (mp_solid->isInside(m_pp[m_c2p[icell][ivert]]))
+                if (mp_solid->phi01(m_pp[m_c2p[icell][ivert]]))
                 {
                     seed = icell;
                     break;
@@ -82,7 +82,7 @@ void CellEnumerator::SetSolid(const Solid& solid)
         if (CountVertexInside(seed, *mp_solid) == m_c2p[seed].size())
             m_ct[seed] = CELL_TYPE::ALL_INSIDE;
         else
-            if (mp_solid->isInside(m_cc[seed]))
+            if (mp_solid->phi01(m_cc[seed]))
                 m_ct[seed] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[seed] = CELL_TYPE::CENTER_OUTSIDE;
