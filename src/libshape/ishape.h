@@ -26,31 +26,20 @@ public:
 class IShape
 {
 public:
-    struct Transformation {const quaternion& q; const vector& t;};
+    struct Transformation {vector t; quaternion q;};
     const static int m_id = -1;
-    scalar m_radiusB;             // radius of bounding sphere
-    scalar m_volume, m_volumeINV; // volume
-    vector m_com;                 // center of mass
-    tensor m_moi, m_moiINV;       // moi in principal frame (nonzero only along diagonal)
-    bool finite;
+    scalar m_radiusB   {0.0}; // radius of bounding sphere
+    scalar m_volume    {0.0};
+    scalar m_volumeINV {0.0}; 
+    vector m_com    {vector::zero};
+    tensor m_moi    {tensor::I}; // in principal frame, diagonal
+    tensor m_moiINV {tensor::I};
+    bool finite {true};
 
 public:
-    IShape()
-    {
-        m_radiusB   = 0.0;
-        m_volume    = 0.0;
-        m_volumeINV = 0.0;
-        m_com       = vector(0.0, 0.0, 0.0);
-
-        m_moi    = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        m_moiINV = tensor(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-
-        finite = true;
-    }
-
     SHAPETYPENAME("IShape");
     
-    inline vector world2local(const vector& p, const Transformation& tr) const
+    inline static vector world2local(const vector& p, const Transformation& tr)
     {
         return Foam::conjugate(tr.q).transform(p - tr.t);
     }
@@ -58,10 +47,10 @@ public:
     virtual int    getShapeID() const {return m_id;}
     virtual scalar getRadiusB() const {return m_radiusB;}
 
-    virtual bool phi01(const vector& p, const Transformation& tr) { return isInside      (world2local(p, tr)); }
-    virtual scalar phi(const vector& p, const Transformation& tr) { return signedDistance(world2local(p, tr)); }
+    bool phi01(const vector& p, const Transformation& tr) { return isInside      (world2local(p, tr)); }
+    scalar phi(const vector& p, const Transformation& tr) { return signedDistance(world2local(p, tr)); }
 
-    virtual std::string description   ()                const = 0;
+    virtual std::string description() const = 0;
 
     virtual ~IShape(){}
 

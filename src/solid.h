@@ -94,16 +94,16 @@ public:
     inline void setMotion(IMotion* solid_motion) { ptr_motion = solid_motion; }
     inline void unsetMotion()                    { ptr_motion = nullptr; }
 
-    // true if the point is inside solid, false otherwise
+    // sdf01 at point, true if inside
     inline bool phi01(const vector& p) const
     {
-        return ptr_shape->phi01(p, {orientation, center});
+        return ptr_shape->phi01(p, {center, orientation});
     }
 
     // sdf at point, negative if inside
     inline scalar phi(const vector& p) const
     {
-        return ptr_shape->phi(p, {orientation, center});
+        return ptr_shape->phi(p, {center, orientation});
     }
 
     inline vector evalPointVelocity(const vector& p) const
