@@ -5,37 +5,33 @@
 #include <queue>
 #include "meshinfo.h"
 #include "meshSearch.H"
+#include "types.h"
+#include <functional>
+#include <memory>
 
 // [08-27-2020] Thanks to Mr. Haorang Wang for the idea of using an enumerator class, and for
 // the code from which the currently class is adapted.
 
 namespace sdfibm {
 
-class Solid;
-
 class CellEnumerator : public MeshInfo
 {
 public:
     enum CELL_TYPE {UNVISITED, ALL_INSIDE, CENTER_INSIDE, CENTER_OUTSIDE, ALL_OUTSIDE};
+    using Predicate = std::function<bool(const vector&)>;
 private:
-    static std::vector<CELL_TYPE> m_ct; // cell type, size = #mesh cell
-    Foam::meshSearch* m_ms;
+    std::vector<CELL_TYPE> m_ct; // cell type, size = #mesh cell
+    Predicate pred_;
 
     std::queue<int> m_queue;
-    const Solid* mp_solid;
 
     void _next();
 
-    /* count the number of vertices of a cell that falls within the solid
-     * @param icell The index of the mesh cell considered
-     * @param solid The solid considered, its shape information is used to check each vertex of the cell
-     */
-    int CountVertexInside(int icell, const Solid& solid) const;
+    int CountVertexInside(int icell, const Predicate& p) const;
 
 public:
-    CellEnumerator(const Foam::fvMesh& mesh);
-    ~CellEnumerator();
-    void SetSolid(const Solid& solid);
+    CellEnumerator(const Foam::fvMesh& mesh, const Predicate& pred, int seed = 0); // TODO, use optional
+    ~CellEnumerator() = default;
 
     inline void Next()
     {

@@ -11,7 +11,7 @@ void CellEnumerator::_next()
         label inb = m_c2c[icur][_];
         if (m_ct[inb] == CELL_TYPE::UNVISITED) // unvisited
         {
-            int n_v_inside = CountVertexInside(inb, *mp_solid);
+            int n_v_inside = CountVertexInside(inb, pred_);
 
             if (n_v_inside==0)
             {
@@ -23,7 +23,7 @@ void CellEnumerator::_next()
             m_queue.push(inb);
             if (n_v_inside == m_c2p[icur].size())
                 m_ct[inb] = CELL_TYPE::ALL_INSIDE;
-            else if (mp_solid->phi01(m_cc[inb]))
+            else if (pred_(m_cc[inb]))
                 m_ct[inb] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[inb] = CELL_TYPE::CENTER_OUTSIDE;
@@ -31,34 +31,22 @@ void CellEnumerator::_next()
     }
 }
 
-/* count the number of vertices of a cell that falls within the solid
- * @param icell The index of the mesh cell considered
- * @param solid The solid considered, it checks each cell vertex for containment
- */
-int CellEnumerator::CountVertexInside(int icell, const Solid& solid) const
+int CellEnumerator::CountVertexInside(int icell, const Predicate& p) const
 {
     int n_v_inside = 0;
     forAll(m_c2p[icell], _)
     {
-        int ivert = m_c2p[icell][_];
-        const vector& p = m_pp[ivert];
-        n_v_inside += solid.phi01(p);
+        int nodeid = m_c2p[icell][_];
+        n_v_inside += p(m_pp[nodeid]);
     }
     return n_v_inside;
 }
 
-CellEnumerator::CellEnumerator(const Foam::fvMesh& mesh) : MeshInfo(mesh)
+CellEnumerator::CellEnumerator(const Foam::fvMesh& mesh, const Predicate& pred, int seed) :
+    MeshInfo(mesh),
+    m_ct(mesh.nCells(), CELL_TYPE::UNVISITED),
+    pred_(pred)
 {
-    m_ms = new Foam::meshSearch(mesh);
-    m_ct.resize(m_cv.size(), CELL_TYPE::UNVISITED);
-}
-
-void CellEnumerator::SetSolid(const Solid& solid)
-{
-    std::fill(m_ct.begin(), m_ct.end(), UNVISITED);
-    mp_solid = &solid;
-
-    int seed = m_ms->findNearestCell(mp_solid->getCenter());
     if (seed < 0)
     {
         forAll(m_cc, icell)
@@ -66,7 +54,7 @@ void CellEnumerator::SetSolid(const Solid& solid)
             if (seed > 0) break;
             forAll(m_c2p[icell], ivert)
             {
-                if (mp_solid->phi01(m_pp[m_c2p[icell][ivert]]))
+                if (pred_(m_pp[m_c2p[icell][ivert]]))
                 {
                     seed = icell;
                     break;
@@ -79,22 +67,14 @@ void CellEnumerator::SetSolid(const Solid& solid)
     {
         m_queue.push(seed);
 
-        if (CountVertexInside(seed, *mp_solid) == m_c2p[seed].size())
+        if (CountVertexInside(seed, pred_) == m_c2p[seed].size())
             m_ct[seed] = CELL_TYPE::ALL_INSIDE;
         else
-            if (mp_solid->phi01(m_cc[seed]))
+            if (pred_(m_cc[seed]))
                 m_ct[seed] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[seed] = CELL_TYPE::CENTER_OUTSIDE;
     }
 }
-
-CellEnumerator::~CellEnumerator()
-{
-    delete m_ms;
-    m_ms = nullptr;
-}
-
-std::vector<CellEnumerator::CELL_TYPE> CellEnumerator::m_ct;
 
 }

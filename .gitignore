@@ -35,3 +35,4 @@ build
 .vscode
 .gitignore
 test_case
+test

@@ -188,7 +188,7 @@ SolidCloud::SolidCloud(const Foam::word& dictfile, Foam::volVectorField& U, scal
     m_Fs (const_cast<Foam::volVectorField&>(m_mesh.lookupObject<Foam::volVectorField>("Fs"))),
     m_Ts (const_cast<Foam::volScalarField&>(m_mesh.lookupObject<Foam::volScalarField>("Ts"))),
     m_geotools(GeometricTools(m_mesh)),
-    m_cellenum(CellEnumerator(m_mesh))
+    m_ms(new Foam::meshSearch(m_mesh))
 {
     m_time = time;
     m_timeStepCounter = 0;
@@ -299,13 +299,15 @@ Type SolidCloud::calcMeanField(Solid& solid, IShape* shape, const Foam::Geometri
     Type meanField  = vector::zero;
     scalar volume = 0.0;
 
-    m_cellenum.SetSolid(tmpSolid);
+    auto pred = [&](const vector& v){return tmpSolid.phi01(v);};
+    int seed = m_ms->findNearestCell(tmpSolid.getCenter());
+    CellEnumerator m_cellenum(m_mesh, pred, seed); // TODO optimize
     int insideType = tmpSolid.getID() + 4;
     scalar alpha = 0.0;
     while (!m_cellenum.Empty())
     {
         int icur = m_cellenum.GetCurCellInd();
-        if (m_cellenum.GetCurCellType() == CellEnumerator::ALL_INSIDE)
+        if (m_cellenum.GetCurCellType() == CellEnumerator::CELL_TYPE::ALL_INSIDE)
         {
             alpha = 1.0;
             m_ct[icur] = insideType;
@@ -340,7 +342,9 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
     vector force  = vector::zero;
     vector torque = vector::zero;
 
-    m_cellenum.SetSolid(solid);
+    int seed = m_ms->findNearestCell(solid.getCenter());
+    auto pred = [&](const vector& v){return solid.phi01(v);};
+    CellEnumerator m_cellenum(m_mesh, pred, seed); // TODO optimize
 
     int numInsideCell = 0;
     int numBorderCell = 0;
@@ -349,7 +353,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
     while (!m_cellenum.Empty())
     {
         int icur = m_cellenum.GetCurCellInd();
-        if (m_cellenum.GetCurCellType() == CellEnumerator::ALL_INSIDE)
+        if (m_cellenum.GetCurCellType() == CellEnumerator::CELL_TYPE::ALL_INSIDE)
         {
             ++numInsideCell;
             alpha = 1.0;
