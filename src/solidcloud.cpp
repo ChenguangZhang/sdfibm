@@ -344,7 +344,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
 
     int seed = m_ms->findNearestCell(solid.getCenter());
     auto pred = [&](const vector& v){return solid.phi01(v);};
-    CellEnumerator m_cellenum(m_mesh, pred, seed); // TODO optimize
+    CellEnumerator m_cellenum(m_mesh, pred, seed);
 
     int numInsideCell = 0;
     int numBorderCell = 0;
