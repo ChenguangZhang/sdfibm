@@ -16,7 +16,7 @@ set(FOAMLIB $ENV{FOAM_LIBBIN})
 set(FOAMSRC $ENV{FOAM_SRC})
 set(FOAMMPI $ENV{FOAM_MPI})
 
-set(FOAMFLAG "-m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wno-unused-parameter -Wno-overloaded-virtual -Wold-style-cast
+set(FOAMFLAG "-std=c++17 -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wno-unused-parameter -Wno-overloaded-virtual -Wold-style-cast
 -Wnon-virtual-dtor -Wno-unused-variable -Wno-unused-local-typedef -Wno-invalid-offsetof -Wno-deprecated-register -Wno-undefined-var-template -DNoRepository -ftemplate-depth-100 -fPIC")
 
 set(FOAMINC

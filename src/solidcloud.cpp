@@ -301,26 +301,26 @@ Type SolidCloud::calcMeanField(Solid& solid, IShape* shape, const Foam::Geometri
 
     auto pred = [&](const vector& v){return tmpSolid.phi01(v);};
     int seed = m_ms->findNearestCell(tmpSolid.getCenter());
-    CellEnumerator m_cellenum(m_mesh, pred, seed); // TODO optimize
+    CellEnumerator ce(m_mesh, pred, seed); // TODO optimize
     int insideType = tmpSolid.getID() + 4;
     scalar alpha = 0.0;
-    while (!m_cellenum.Empty())
+    while (!ce.Empty())
     {
-        int icur = m_cellenum.GetCurCellInd();
-        if (m_cellenum.GetCurCellType() == CellEnumerator::CELL_TYPE::ALL_INSIDE)
+        int icur = ce.GetCurCellInd();
+        if (ce.GetCurCellType() == CellEnumerator::CELL_TYPE::ALL_INSIDE)
         {
             alpha = 1.0;
             m_ct[icur] = insideType;
         }
         else
         {
-            m_ct[icur] = m_cellenum.GetCurCellType();
+            m_ct[icur] = ce.GetCurCellType();
             alpha = m_geotools.calcCellVolume(icur, tmpSolid, m_ON_TWOD)/cv[icur];
         }
         scalar dV = alpha*cv[icur];
         volume    += dV;
         meanField += dV*field[icur];
-        m_cellenum.Next();
+        ce.Next();
     }
 
     if (Foam::Pstream::parRun())
@@ -343,49 +343,42 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
     vector torque = vector::zero;
 
     int seed = m_ms->findNearestCell(solid.getCenter());
-    auto pred = [&](const vector& v){return solid.phi01(v);};
-    CellEnumerator m_cellenum(m_mesh, pred, seed);
+    CellEnumerator ce(m_mesh, [&](const vector& v){return solid.phi01(v);}, seed);
+    auto is = ce.mark();
 
-    int numInsideCell = 0;
-    int numBorderCell = 0;
     int insideType = solid.getID() + 4;
     scalar alpha = 0.0;
-    while (!m_cellenum.Empty())
-    {
-        int icur = m_cellenum.GetCurCellInd();
-        if (m_cellenum.GetCurCellType() == CellEnumerator::CELL_TYPE::ALL_INSIDE)
-        {
-            ++numInsideCell;
-            alpha = 1.0;
-            m_ct[icur] = insideType;
-        }
-        else
-        {
-            m_ct[icur] = m_cellenum.GetCurCellType();
-            ++numBorderCell;
-            alpha = m_geotools.calcCellVolume(icur, solid, m_ON_TWOD)/cv[icur];
-        }
 
-        vector us = solid.evalPointVelocity(cc[icur]);
-        vector uf = m_Uf[icur];
-        vector localforce = alpha*cv[icur]*(uf - us)*dtINV;
+    auto perCellForce = [&](int cellid)
+    {
+        vector us = solid.evalPointVelocity(cc[cellid]);
+        vector uf = m_Uf[cellid];
+        vector localforce = alpha*cv[cellid]*(uf - us)*dtINV;
         force    += localforce;
-        torque   += (cc[icur]-solid.getCenter()) ^ localforce;
-        m_Fs[icur] += localforce/cv[icur];
-        m_As[icur] += alpha;
-        m_Ts[icur] += alpha;
+        torque   += (cc[cellid]-solid.getCenter()) ^ localforce;
+        m_Fs[cellid] += localforce/cv[cellid];
+        m_As[cellid] += alpha;
+        m_Ts[cellid] += alpha;
+    };
 
-        m_cellenum.Next();
-    }
-
-    if (Foam::Pstream::parRun())
+    for(auto cellid : is[CellEnumerator::CELL_TYPE::ALL_INSIDE])
     {
-        Foam::reduce(numInsideCell, Foam::sumOp<Foam::scalar>());
-        Foam::reduce(numBorderCell, Foam::sumOp<Foam::scalar>());
+        m_ct[cellid] = insideType;
+        alpha = 1.0;
+        perCellForce(cellid);
     }
-
-    Foam::Info << "Solid " << solid.getID() << " has " << numInsideCell << '/'
-               << numBorderCell << " internal/boundary cells.\n";
+    for(auto cellid : is[CellEnumerator::CELL_TYPE::CENTER_INSIDE])
+    {
+        m_ct[cellid] = CellEnumerator::CELL_TYPE::CENTER_INSIDE;
+        alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
+        perCellForce(cellid);
+    }
+    for(auto cellid : is[CellEnumerator::CELL_TYPE::CENTER_OUTSIDE])
+    {
+        m_ct[cellid] = CellEnumerator::CELL_TYPE::CENTER_INSIDE;
+        alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
+        perCellForce(cellid);
+    }
 
     force  *= m_rhof;
     torque *= m_rhof;

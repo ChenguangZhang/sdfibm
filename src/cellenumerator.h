@@ -44,14 +44,10 @@ public:
         m_queue.pop();
     }
 
-    void mark()
+    const IntersectionSet& mark()
     {
         while(!Empty())
             Next();
-    }
-
-    inline const IntersectionSet& getIntersectionSet() const
-    {
         return is_;
     }
 
