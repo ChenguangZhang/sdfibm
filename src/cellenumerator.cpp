@@ -16,6 +16,7 @@ void CellEnumerator::_next()
             if (n_v_inside==0)
             {
                 m_ct[inb] = CELL_TYPE::ALL_OUTSIDE;
+                is_[m_ct[inb]].insert(inb);
                 continue;
             }
 
@@ -27,6 +28,7 @@ void CellEnumerator::_next()
                 m_ct[inb] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[inb] = CELL_TYPE::CENTER_OUTSIDE;
+            is_[m_ct[inb]].insert(inb);
         }
     }
 }
@@ -74,6 +76,7 @@ CellEnumerator::CellEnumerator(const Foam::fvMesh& mesh, const Predicate& pred, 
                 m_ct[seed] = CELL_TYPE::CENTER_INSIDE;
             else
                 m_ct[seed] = CELL_TYPE::CENTER_OUTSIDE;
+        is_[m_ct[seed]].insert(seed);
     }
 }
 

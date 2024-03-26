@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <unordered_map>
 #include "meshinfo.h"
 #include "meshSearch.H"
 #include "types.h"
@@ -21,16 +22,11 @@ class CellEnumerator : public MeshInfo
 public:
     enum CELL_TYPE {UNVISITED, ALL_INSIDE, CENTER_INSIDE, CENTER_OUTSIDE, ALL_OUTSIDE};
     using Predicate = std::function<bool(const vector&)>;
-    struct IntersectionSet
-    {
-        std::set<size_t> all_inside_cells;
-        std::set<size_t> center_inside_cells;
-        std::set<size_t> center_outside_cells;
-        std::set<size_t> all_outside_cells;
-    };
+    using IntersectionSet = std::unordered_map<CELL_TYPE, std::set<size_t>>;
 private:
     std::vector<CELL_TYPE> m_ct; // cell type, size = #mesh cell
     Predicate pred_;
+    IntersectionSet is_;
 
     std::queue<int> m_queue;
 
@@ -48,6 +44,16 @@ public:
         m_queue.pop();
     }
 
+    void mark()
+    {
+        while(!Empty())
+            Next();
+    }
+
+    inline const IntersectionSet& getIntersectionSet() const
+    {
+        return is_;
+    }
 
     inline int GetCurCellInd() const
     {
