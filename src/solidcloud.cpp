@@ -336,7 +336,7 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
 {
     int seed = m_ms->findNearestCell(solid.getCenter());
     CellEnumerator ce(m_mesh, [&](const vector& v){return solid.phi01(v);}, seed);
-    auto is = ce.mark();
+    auto is = ce.intersect();
 
     using CT = CellEnumerator::CELL_TYPE;
     size_t num_inside_cells = is[CT::ALL_INSIDE].size();

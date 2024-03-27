@@ -44,7 +44,7 @@ public:
         m_queue.pop();
     }
 
-    const IntersectionSet& mark()
+    const IntersectionSet& intersect()
     {
         while(!Empty())
             Next();
