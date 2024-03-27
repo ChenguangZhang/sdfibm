@@ -334,6 +334,39 @@ Type SolidCloud::calcMeanField(Solid& solid, IShape* shape, const Foam::Geometri
 
 void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
 {
+    int seed = m_ms->findNearestCell(solid.getCenter());
+    CellEnumerator ce(m_mesh, [&](const vector& v){return solid.phi01(v);}, seed);
+    auto is = ce.mark();
+
+    using CT = CellEnumerator::CELL_TYPE;
+    size_t num_inside_cells = is[CT::ALL_INSIDE].size();
+    size_t num_boundary_cells = is[CT::CENTER_INSIDE].size() + is[CT::CENTER_OUTSIDE].size();
+    std::vector<size_t> cellids;
+    cellids.reserve(num_inside_cells + num_boundary_cells);
+    cellids.insert(cellids.end(), is[CT::ALL_INSIDE].begin(), is[CT::ALL_INSIDE].end());
+    cellids.insert(cellids.end(), is[CT::CENTER_INSIDE].begin(), is[CT::CENTER_INSIDE].end());
+    cellids.insert(cellids.end(), is[CT::CENTER_OUTSIDE].begin(), is[CT::CENTER_OUTSIDE].end());
+
+    int insideType = solid.getID() + 4;
+    for(auto cellid : is[CT::ALL_INSIDE])
+        m_ct[cellid] = insideType;
+    for (auto cellid : is[CT::CENTER_INSIDE])
+        m_ct[cellid] = CT::CENTER_INSIDE;
+    for (auto cellid : is[CT::CENTER_OUTSIDE])
+        m_ct[cellid] = CT::CENTER_OUTSIDE;
+
+    auto pcHydrodynamicInteraction = [](const Solid& solid, const vector& uf, const vector& cc, scalar alpha) -> std::pair<vector, vector>
+    {
+        vector us = solid.evalPointVelocity(cc);
+        vector force = alpha*(uf - us);
+        vector torque = (cc - solid.getCenter()) ^ force;
+        return {force, torque};
+    };
+    auto pcThermalInteraction = [](const Solid& solid, const vector& uf, const vector& cc, scalar alpha) -> scalar
+    {
+        return alpha;
+    };
+
     m_geotools.clearCache();
     const Foam::vectorField& cc = m_mesh.cellCentres();
     const Foam::scalarField& cv = m_mesh.V();
@@ -342,42 +375,25 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
     vector force  = vector::zero;
     vector torque = vector::zero;
 
-    int seed = m_ms->findNearestCell(solid.getCenter());
-    CellEnumerator ce(m_mesh, [&](const vector& v){return solid.phi01(v);}, seed);
-    auto is = ce.mark();
-
-    int insideType = solid.getID() + 4;
-    scalar alpha = 0.0;
-
-    auto perCellForce = [&](int cellid)
+    for(size_t counter = 0; counter < cellids.size(); ++counter)
     {
-        vector us = solid.evalPointVelocity(cc[cellid]);
-        vector uf = m_Uf[cellid];
-        vector localforce = alpha*cv[cellid]*(uf - us)*dtINV;
-        force    += localforce;
-        torque   += (cc[cellid]-solid.getCenter()) ^ localforce;
-        m_Fs[cellid] += localforce/cv[cellid];
+        auto cellid = cellids[counter];
+
+        // alpha
+        scalar alpha {1.0};
+        if (counter > num_inside_cells)
+            alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
         m_As[cellid] += alpha;
-        m_Ts[cellid] += alpha;
-    };
 
-    for(auto cellid : is[CellEnumerator::CELL_TYPE::ALL_INSIDE])
-    {
-        m_ct[cellid] = insideType;
-        alpha = 1.0;
-        perCellForce(cellid);
-    }
-    for(auto cellid : is[CellEnumerator::CELL_TYPE::CENTER_INSIDE])
-    {
-        m_ct[cellid] = CellEnumerator::CELL_TYPE::CENTER_INSIDE;
-        alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
-        perCellForce(cellid);
-    }
-    for(auto cellid : is[CellEnumerator::CELL_TYPE::CENTER_OUTSIDE])
-    {
-        m_ct[cellid] = CellEnumerator::CELL_TYPE::CENTER_INSIDE;
-        alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
-        perCellForce(cellid);
+        // hydrodynamic interaction
+        auto [f_, t_] = pcHydrodynamicInteraction(solid, m_Uf[cellid], cc[cellid], alpha);
+        force += f_*cv[cellid]*dtINV;
+        torque+= t_*cv[cellid]*dtINV;
+        m_Fs[cellid] += f_*dtINV;
+
+        // thermal interaction
+        auto T_ = pcThermalInteraction(solid, m_Uf[cellid], cc[cellid], alpha);
+        m_Ts[cellid] += T_;
     }
 
     force  *= m_rhof;
