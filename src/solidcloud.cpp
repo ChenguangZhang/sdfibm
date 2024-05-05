@@ -263,12 +263,11 @@ void SolidCloud::fixInternal(scalar dt)
 {
     // after updating solid velocity, fix fluid velocity in cells fully covered by solid
     const Foam::vectorField& cc = m_mesh.C().internalField();
-    const Foam::volScalarField & ct = m_ct;
     forAll(cc, icell)
     {
-        if (ct[icell] >= 4) // if cell totally within a solid
+        if (m_ct[icell] >= 4) // if cell totally within a solid
         {
-            label id = ct[icell] - 4; // id of the solid that contains this cell
+            label id = m_ct[icell] - 4; // id of the solid that contains this cell
             m_Uf[icell] =  m_solids[id].evalPointVelocity(cc[icell]);
         }
     }
