@@ -27,7 +27,13 @@ public:
     IForcer() = default;
     virtual ~IForcer() = default;
 
-    virtual Force generate(const scalar& time, const vector& position, const vector& velocity) = 0;
+    virtual Force generate(
+        const scalar& time,
+        const vector& position,
+        const vector& velocity,
+        const quaternion& orientation,
+        const vector& omega
+        ) = 0;
     virtual std::string description() const = 0;
 };
 

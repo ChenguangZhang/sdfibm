@@ -143,7 +143,7 @@ public:
     {
         if (!ptr_forcer)
             return;
-        auto [f_,t_] = ptr_forcer->generate(time, center, velocity);
+        auto [f_,t_] = ptr_forcer->generate(time, center, velocity, orientation, omega);
         force += f_;
         torque += t_;
     }

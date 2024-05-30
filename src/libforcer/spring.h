@@ -8,7 +8,7 @@ namespace sdfibm::force {
 class Spring : public IForcer, _creator<Spring>
 {
 public:
-    virtual Force generate(const scalar &time, const vector& position, const vector& velocity) override final;
+    virtual Force generate(const scalar&, const vector&, const vector&, const quaternion&, const vector&) override final;
     // update below
     Spring(const dictionary& para)
     {
@@ -31,7 +31,13 @@ private:
     scalar l;
 };
 
-IForcer::Force Spring::generate(const scalar &time, const vector &position, const vector &velocity)
+IForcer::Force Spring::generate(
+        const scalar& time,
+        const vector& position,
+        const vector& velocity,
+        const quaternion& orientation,
+        const vector& omega
+)
 {
     vector r = position - pivot;
     return {-k * r * (1.0 - l/mag(r)), vector::zero};
