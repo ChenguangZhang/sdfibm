@@ -4,6 +4,7 @@
 #include "../types.h"
 #include "./sdf/sdf.h"
 #include <algorithm>
+#include <memory>
 namespace sdfibm {
 
 #define SHAPETYPENAME(name) \
@@ -17,9 +18,9 @@ template <typename T>
 class _shapecreator
 {
 public:
-    static IShape* create(const dictionary& para)
+    static std::unique_ptr<IShape> create(const dictionary& para)
     {
-        return new T(para);
+        return std::make_unique<T>(para);
     }
 };
 

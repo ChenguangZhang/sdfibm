@@ -2,14 +2,15 @@ set(libName force)
 
 set(
     libSrc
-    forcefactory.cpp
+    forcerfactory.cpp
 )
 
 set(
     libInc
-    iforce.h
+    iforcer.h
     constant.h
     spring.h
+    forcerfactory.h
 )
 
 add_library(

@@ -1,18 +1,18 @@
 #ifndef FORCESPRING_H
 #define FORCESPRING_H
 
-#include "iforce.h"
+#include "iforcer.h"
 
 namespace sdfibm::force {
 
-class Spring : public IForce, _creator<Spring>
+class Spring : public IForcer, _creator<Spring>
 {
 public:
     virtual Force generate(const scalar &time, const vector& position, const vector& velocity) override final;
     // update below
     Spring(const dictionary& para)
     {
-        anchor = para.lookup("anchor");
+        pivot = para.lookup("pivot");
         try {
             k = Foam::readScalar(para.lookup("k"));
             l = Foam::readScalar(para.lookup("l"));
@@ -24,16 +24,16 @@ public:
     }
     virtual ~Spring() override final {}
     TYPENAME("Spring") // a linear motion
-    virtual std::string description() const override {return "Spring force with a anchor, stiffness (k), and rest length (l)";}
+    virtual std::string description() const override {return "Spring forcer with a pivot, stiffness (k), and rest length (l)";}
 private:
-    vector anchor; 
+    vector pivot; 
     scalar k;
     scalar l;
 };
 
-IForce::Force Spring::generate(const scalar &time, const vector &position, const vector &velocity)
+IForcer::Force Spring::generate(const scalar &time, const vector &position, const vector &velocity)
 {
-    vector r = position - anchor;
+    vector r = position - pivot;
     return {-k * r * (1.0 - l/mag(r)), vector::zero};
 }
 

@@ -7,6 +7,7 @@
 #include "sstream"
 #include "./libmotion/motionfactory.h"
 #include "./libshape/shapefactory.h"
+#include "./libforcer/forcerfactory.h"
 namespace sdfibm {
 
 void SolidCloud::initFromDictionary(const Foam::word& dictfile)
@@ -60,28 +61,43 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
             ShapeFactory::report(LOGF);
             LOGF << "--> Used shapes:\n";
         }
-        const dictionary& shapes = root.subDict("shapes");
-        m_radiusB = -1.0;
-        for (int i=0; i < shapes.size(); ++i)
+
         {
-            const dictionary& para = shapes.subDict(shapes.toc()[i]);
-            std::string type = Foam::word(para.lookup("type"));
-            std::string name = Foam::word(para.lookup("name"));
-
-            m_libshape[name] = ShapeFactory::create(type, para);
-            if (m_libshape[name] == nullptr)
-                throw std::runtime_error(std::string("Unrecognized shape type " + type + '\n'));
-            m_radiusB = std::max(m_radiusB, m_libshape[name]->getRadiusB());
-
+            m_libshape = EntityLibrary<IShape>(root.subDict("shapes"));
             if (Foam::Pstream::master())
-                LOGF << "[+] " << type << " as " << name << " (" << m_libshape[name]->description() << ")\n";
+            {
+                // for (const auto& [name, shape] : data)
+                //     LOGF << "[+] " << name << " (" << shape->description() << ")\n";
+                LOGF << m_libshape;
+            }
+
+            m_radiusB = -1.0; // TODO find the maximum bounding radius, used to create the uniform grid for collision detection
+            if (Foam::Pstream::master())
+            {
+                LOGF << "maximum bounding radius is " << m_radiusB << '\n';
+            }
         }
 
-        // find the maximum bounding radius, used to create the uniform grid for collision detection
-        if (Foam::Pstream::master())
+        // read and create forcers
         {
-            LOGF << "maximum bounding radius is " << m_radiusB << '\n';
+            if (Foam::Pstream::master())
+            {
+                LOGF << GenBanner("CREATE: FORCES");
+                LOGF << "--> Available force types:\n";
+                force::ForcerFactory::report(LOGF);
+                LOGF << "--> Used Forces:\n";
+            }
+
+            if (root.found("forces"))
+            {
+                m_libforcer = EntityLibrary<force::IForcer>(root.subDict("forces"));
+                if (Foam::Pstream::master())
+                {
+                    LOGF << m_libforcer;
+                }
+            }
         }
+
 
         // read and create motions
         if (Foam::Pstream::master())
@@ -168,7 +184,17 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
         std::string shp_name = Foam::word(solid.lookup("shp_name"));
         if (mot_name!="free")
             s.setMotion(m_libmotion[mot_name]);
-        s.setShape(m_libshape[shp_name]);
+        s.setShape(m_libshape[shp_name].get()); // TODO: currently raw pointer is used
+        if (solid.found("for_name"))
+        {
+            std::string for_name = Foam::word(solid.lookup("for_name"));
+            auto forcer = m_libforcer.find(for_name);
+            if (forcer == m_libforcer.end())
+                throw std::runtime_error("Unrecognized force name " + for_name);
+            else
+                s.setForcer(forcer->second.get());
+        }
+
         s.setMaterial(m_libmat[mat_name]);
         this->addSolid(std::move(s));
 
@@ -280,7 +306,8 @@ void SolidCloud::writeMeanField()
         return;
     for (Solid& solid : m_solids)
     {
-        vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler], m_Uf);
+        // vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler], m_Uf);
+        vector vMean = vector::zero; // XXX
         meanFieldFile << vMean.x() << ' ' << vMean.y() << ' ' << vMean.z() << ' ';
     }
     meanFieldFile << '\n';
@@ -504,6 +531,11 @@ void SolidCloud::evolve(scalar time, scalar dt)
         for (Solid& solid : m_solids)
             solid.clearForceAndTorque();
         // NOW Fn = 0.0
+
+        for (Solid& solid : m_solids)
+        {
+            solid.applyForcer(time);
+        }
 
         for (Solid& solid : m_solids)
         {

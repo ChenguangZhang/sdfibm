@@ -1,39 +1,39 @@
-#ifndef SHAPEFACTORY_H
-#define SHAPEFACTORY_H
+#pragma once
 
-#include <map>
-#include <memory>
 #include "../types.h"
-namespace sdfibm{
+#include "../genericfactory.h"
+#include "ishape.h"
+#include <cassert>
+namespace sdfibm {
+    MAKESPECIALFACTORY(Shape, IShape, Foam::dictionary);
 
-class IShape;
+    #define REGISTERSHAPE(m) \
+        bool sdfibm::m::added = ShapeFactory::add(sdfibm::m::typeName(), sdfibm::m::create);
 
-class ShapeFactory
-{
-public:
-    using TCreateMethod = IShape* (*)(const dictionary&);
+    #include "circle.h"
+    REGISTERSHAPE(Circle);
 
-public:
-    // could be a singleton, for now just disable ctor
-    ShapeFactory() = delete;
+    #include "sphere.h"
+    REGISTERSHAPE(Sphere);
 
-    static bool add(const std::string& name, TCreateMethod create_method);
-    static IShape* create(const std::string& name, const dictionary&);
+    #include "ellipse.h"
+    REGISTERSHAPE(Ellipse);
 
-    static void report(std::ostream& os = std::cout)
-    {
-        // displays all the motions the factory can "produce"
-        int i = 1;
-        for(auto it : m_methods)
-        {
-            os << '[' << i << "] " << it.first << std::endl;
-            ++i;
-        }
-    }
+    #include "ellipsoid.h"
+    REGISTERSHAPE(Ellipsoid);
 
-private:
-    static std::map<std::string, TCreateMethod> m_methods;
-};
+    #include "rectangle.h"
+    REGISTERSHAPE(Rectangle);
 
+    #include "circle_tail.h"
+    REGISTERSHAPE(Circle_Tail);
+
+    #include "circle_twotail.h"
+    REGISTERSHAPE(Circle_TwoTail);
+
+    #include "box.h"
+    REGISTERSHAPE(Box);
+
+    #include "plane.h"
+    REGISTERSHAPE(Plane);
 }
-#endif

@@ -5,6 +5,7 @@
 #include "./libshape/ishape.h"
 #include "./libmotion/imotion.h"
 #include "./libmaterial/imaterial.h"
+#include "./libforcer/iforcer.h"
 #include "utils.h"
 #include "fvc.H"
 
@@ -39,6 +40,7 @@ protected:
     // property pointers
     IMotion*   ptr_motion;
     IShape*    ptr_shape;
+    force::IForcer*    ptr_forcer;
     IMaterial* ptr_material;
 
     // object properties = shape x material
@@ -79,7 +81,13 @@ public:
     inline scalar     getRadiusB()  const {return ptr_shape->getRadiusB();}
     inline bool       isFinite()    const {return ptr_shape->finite;}
 
-    inline void setShape(IShape* shape) { ptr_shape = shape; }
+    inline void setShape(IShape* shape) {
+        ptr_shape = shape;
+    }
+    void setForcer(force::IForcer* forcer)
+    {
+        ptr_forcer = forcer;
+    } // TODO, akward name
     inline void setMaterial(IMaterial* material)
     {
         ptr_material = material;
@@ -130,6 +138,14 @@ public:
     {
         fluid_force_old  = fluid_force;
         fluid_torque_old = fluid_torque;
+    }
+    inline void applyForcer(scalar& time)
+    {
+        if (!ptr_forcer)
+            return;
+        auto [f_,t_] = ptr_forcer->generate(time, center, velocity);
+        force += f_;
+        torque += t_;
     }
     inline void addMidFluidForceAndTorque()
     {

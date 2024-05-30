@@ -1,8 +1,7 @@
-#ifndef IMOTION_H_INCLUDED
-#define IMOTION_H_INCLUDED
+#pragma once
 
-#include <utility>
 #include "../types.h"
+#include <memory>
 
 namespace sdfibm::force {
 
@@ -10,27 +9,26 @@ namespace sdfibm::force {
     static std::string typeName() {return name;} \
     static bool added;
 
-class IForce;
+class IForcer;
 template <typename T>
 class _creator
 {
 public:
-    static IForce* create(const dictionary& node)
+    static std::unique_ptr<IForcer> create(const dictionary& para)
     {
-        return new T(node);
+        return std::make_unique<T>(para);
     }
 };
 
-class IForce
+class IForcer
 {
 public:
     using Force = std::pair<vector, vector>;
-    IForce() = default;
-    virtual ~IForce() = default;
+    IForcer() = default;
+    virtual ~IForcer() = default;
 
     virtual Force generate(const scalar& time, const vector& position, const vector& velocity) = 0;
-    virtual std::string description() const = 0; // more detailed information
+    virtual std::string description() const = 0;
 };
 
 }
-#endif

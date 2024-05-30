@@ -1,16 +1,16 @@
 #ifndef MOTION01MASK_H
 #define MOTION01MASK_H
 
-#include "iforce.h"
+#include "iforcer.h"
 namespace sdfibm::force {
 
-class Constant : public IForce, _creator<Constant>
+class Constant : public IForcer, _creator<Constant>
 {
 public:
     virtual Force generate(const scalar &time, const vector& position, const vector& velocity) override final;
     virtual ~Constant() override final {}
     TYPENAME("Constant")
-    virtual std::string description() const override {return "const force and torque";}
+    virtual std::string description() const override {return "forcer with const force and torque";}
 
     Constant(const dictionary& para)
     {
@@ -22,7 +22,7 @@ private:
     vector force, torque;
 };
 
-IForce::Force Constant::generate(const scalar &time, const vector& position, const vector& velocity)
+IForcer::Force Constant::generate(const scalar &time, const vector& position, const vector& velocity)
 {
     return {force, torque};
 }

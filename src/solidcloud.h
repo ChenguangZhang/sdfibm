@@ -10,15 +10,25 @@
 #include "fvm.H"
 #include "types.h"
 #include "solid.h"
-#include "./libmaterial/imaterial.h"
+
 #include "utils.h"
 #include "logger.h"
 #include "geometrictools.h"
 #include "cellenumerator.h"
 
+#include "entitylibrary.h"
+
 #include "./libcollision/ugrid.h"
 #include "./libcollision/bbox.h"
 #include "./libcollision/collision.h"
+
+class IMotion;
+class IMaterial;
+class IShape;
+
+namespace sdfibm::force {
+    class IForcer;
+}
 
 namespace sdfibm {
 
@@ -62,7 +72,8 @@ private:
 
     std::map<std::string, IMotion*  > m_libmotion;
     std::map<std::string, IMaterial*> m_libmat;
-    std::map<std::string, IShape*   > m_libshape;
+    EntityLibrary<IShape> m_libshape;
+    EntityLibrary<force::IForcer> m_libforcer;
     std::ofstream statefile;
     std::ofstream meanFieldFile;
 

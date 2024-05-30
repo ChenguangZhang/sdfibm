@@ -1,6 +1,6 @@
 add_subdirectory(libshape)
 add_subdirectory(libmotion)
-add_subdirectory(libforce)
+add_subdirectory(libforcer)
 add_subdirectory(libmaterial)
 add_subdirectory(libcollision)
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
