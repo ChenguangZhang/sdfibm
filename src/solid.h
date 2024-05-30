@@ -40,7 +40,7 @@ protected:
     // property pointers
     IMotion*   ptr_motion;
     IShape*    ptr_shape;
-    force::IForcer*    ptr_forcer;
+    forcer::IForcer*    ptr_forcer;
     IMaterial* ptr_material;
 
     // object properties = shape x material
@@ -84,7 +84,7 @@ public:
     inline void setShape(IShape* shape) {
         ptr_shape = shape;
     }
-    void setForcer(force::IForcer* forcer)
+    void setForcer(forcer::IForcer* forcer)
     {
         ptr_forcer = forcer;
     } // TODO, akward name

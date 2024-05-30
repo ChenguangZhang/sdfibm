@@ -1,8 +1,7 @@
-#ifndef MOTION01MASK_H
-#define MOTION01MASK_H
+#pragma once
 
 #include "iforcer.h"
-namespace sdfibm::force {
+namespace sdfibm::forcer {
 
 class Constant : public IForcer, _creator<Constant>
 {
@@ -34,4 +33,3 @@ IForcer::Force Constant::generate(
 }
 
 }
-#endif

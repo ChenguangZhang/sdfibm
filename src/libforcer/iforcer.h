@@ -3,7 +3,7 @@
 #include "../types.h"
 #include <memory>
 
-namespace sdfibm::force {
+namespace sdfibm::forcer {
 
 #define TYPENAME(name) \
     static std::string typeName() {return name;} \

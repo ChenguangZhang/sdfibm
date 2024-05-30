@@ -26,7 +26,7 @@ class IMotion;
 class IMaterial;
 class IShape;
 
-namespace sdfibm::force {
+namespace sdfibm::forcer {
     class IForcer;
 }
 
@@ -73,7 +73,7 @@ private:
     std::map<std::string, IMotion*  > m_libmotion;
     std::map<std::string, IMaterial*> m_libmat;
     EntityLibrary<IShape> m_libshape;
-    EntityLibrary<force::IForcer> m_libforcer;
+    EntityLibrary<forcer::IForcer> m_libforcer;
     std::ofstream statefile;
     std::ofstream meanFieldFile;
 

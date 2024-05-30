@@ -1,15 +1,14 @@
-#ifndef FORCESPRING_H
-#define FORCESPRING_H
+#pragma once
 
 #include "iforcer.h"
 
-namespace sdfibm::force {
+namespace sdfibm::forcer {
 
 class Spring : public IForcer, _creator<Spring>
 {
 public:
     virtual Force generate(const scalar&, const vector&, const vector&, const quaternion&, const vector&) override final;
-    // update below
+
     Spring(const dictionary& para)
     {
         pivot = para.lookup("pivot");
@@ -23,7 +22,7 @@ public:
         }
     }
     virtual ~Spring() override final {}
-    TYPENAME("Spring") // a linear motion
+    TYPENAME("Spring")
     virtual std::string description() const override {return "Spring forcer with a pivot, stiffness (k), and rest length (l)";}
 private:
     vector pivot; 
@@ -44,4 +43,3 @@ IForcer::Force Spring::generate(
 }
 
 }
-#endif

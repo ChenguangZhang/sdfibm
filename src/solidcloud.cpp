@@ -84,13 +84,13 @@ void SolidCloud::initFromDictionary(const Foam::word& dictfile)
             {
                 LOGF << GenBanner("CREATE: FORCES");
                 LOGF << "--> Available force types:\n";
-                force::ForcerFactory::report(LOGF);
+                forcer::ForcerFactory::report(LOGF);
                 LOGF << "--> Used Forces:\n";
             }
 
             if (root.found("forces"))
             {
-                m_libforcer = EntityLibrary<force::IForcer>(root.subDict("forces"));
+                m_libforcer = EntityLibrary<forcer::IForcer>(root.subDict("forces"));
                 if (Foam::Pstream::master())
                 {
                     LOGF << m_libforcer;
