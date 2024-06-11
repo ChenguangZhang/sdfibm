@@ -12,4 +12,6 @@ namespace sdfibm::forcer {
     REGISTERFORCE(forcer::Constant);
     #include "spring.h"
     REGISTERFORCE(forcer::Spring);
+    #include "magnetic.h"
+    REGISTERFORCE(forcer::Magnetic);
 }

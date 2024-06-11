@@ -10,6 +10,7 @@ set(
     iforcer.h
     constant.h
     spring.h
+    magnetic.h
     forcerfactory.h
 )
 
