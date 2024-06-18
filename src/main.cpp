@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
             TEqn.solve();
         }
 
-
         solidcloud.interact(runTime.value(), dt.value());
 
         if(solidcloud.isOnFluid())

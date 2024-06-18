@@ -38,10 +38,10 @@ protected:
     vector fluid_torque_old;
 
     // property pointers
-    IMotion*   ptr_motion;
-    IShape*    ptr_shape;
-    forcer::IForcer*    ptr_forcer;
-    IMaterial* ptr_material;
+    IMotion*   ptr_motion {nullptr};
+    IShape*    ptr_shape {nullptr};
+    forcer::IForcer*    ptr_forcer {nullptr};
+    IMaterial* ptr_material {nullptr};
 
     // object properties = shape x material
     scalar mass;
