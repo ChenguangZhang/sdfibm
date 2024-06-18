@@ -52,17 +52,8 @@ motions
     motion1
     {
        name free1;
-       type Motion111111;
-    }
-    motion2
-    {
-      name static1;
-      type Motion000000;
-    }
-    motion3
-    {
-      name onlyzrot1;
-      type Motion000001;
+       type Motion01Mask;
+       mask b111111;
     }
 }
 
@@ -1066,35 +1057,5 @@ solids
       pos (1.8 7.8 0.0);
       vel (0.0 0.0 0.0);
       euler (0.0 0.0 0.0);
-    }
-}
-planes
-{
-    plane1
-    {
-      shp_name plane1;
-      mot_name static1;
-      mat_name mat1;
-      pos (0.0 0.0 0.0);
-      vel (0.0 0.0 0.0);
-      euler (0.0 0.0 0.0);
-    }
-    plane2
-    {
-      shp_name plane1;
-      mot_name static1;
-      mat_name mat1;
-      pos (-4.0 0.0 0.0);
-      vel (0.0 0.0 0.0);
-      euler (0.0 0.0 -90.0);
-    }
-    plane3
-    {
-      shp_name plane1;
-      mot_name static1;
-      mat_name mat1;
-      pos (4.0 0.0 0.0);
-      vel (0.0 0.0 0.0);
-      euler (0.0 0.0 90.0);
     }
 }
