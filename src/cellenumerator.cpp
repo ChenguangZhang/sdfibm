@@ -49,18 +49,15 @@ CellEnumerator::CellEnumerator(const Foam::fvMesh& mesh, const Predicate& pred, 
     m_ct(mesh.nCells(), CELL_TYPE::UNVISITED),
     pred_(pred)
 {
-    if (seed < 0)
+    if (CountVertexInside(seed, pred_) == 0)
     {
+        seed = -1;
         forAll(m_cc, icell)
         {
-            if (seed > 0) break;
-            forAll(m_c2p[icell], ivert)
+            if (CountVertexInside(icell, pred_) > 0)
             {
-                if (pred_(m_pp[m_c2p[icell][ivert]]))
-                {
-                    seed = icell;
-                    break;
-                }
+                seed = icell;
+                break;
             }
         }
     }
