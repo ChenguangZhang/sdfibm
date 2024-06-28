@@ -406,8 +406,8 @@ void SolidCloud::solidFluidInteract(Solid& solid, scalar dt)
         auto cellid = cellids[counter];
 
         // alpha
-        scalar alpha {1.0};
-        if (counter > num_inside_cells)
+        scalar alpha = num_inside_cells > 0 ? 1.0 : 0.0;
+        if (counter >= num_inside_cells)
             alpha = m_geotools.calcCellVolume(cellid, solid, m_ON_TWOD)/cv[cellid];
         m_As[cellid] += alpha;
 
