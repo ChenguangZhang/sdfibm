@@ -32,10 +32,16 @@ protected:
     // fluid only force
     vector fluid_force {vector::zero};
     vector fluid_torque {vector::zero};
-
     // fluid only force from last time step
     vector fluid_force_old {vector::zero};
     vector fluid_torque_old {vector::zero};
+    bool first_fluid_step {true};
+
+    vector forcer_force {vector::zero};
+    vector forcer_torque {vector::zero};
+    vector forcer_force_old {vector::zero};
+    vector forcer_torque_old {vector::zero};
+    bool first_forcer_step {true};
 
     // property pointers
     IMotion*   ptr_motion {nullptr};
@@ -136,17 +142,33 @@ public:
     {
         fluid_force_old  = fluid_force;
         fluid_torque_old = fluid_torque;
+        forcer_force_old = forcer_force;
+        forcer_torque_old = forcer_torque;
     }
     inline void applyForcer(scalar& time)
     {
         if (!ptr_forcer)
             return;
         auto [f_,t_] = ptr_forcer->generate(time, center, velocity, orientation, omega);
-        force += f_;
-        torque += t_;
+        forcer_force = f_;
+        forcer_torque = t_;
+        if (first_forcer_step)
+        {
+            forcer_force_old = forcer_force;
+            forcer_torque_old = forcer_torque;
+            first_forcer_step = false;
+        }
+        force += (1.5*forcer_force - 0.5*forcer_force_old);
+        torque += (1.5*forcer_torque - 0.5*forcer_torque_old);
     }
     inline void addMidFluidForceAndTorque()
     {
+        if (first_fluid_step)
+        {
+            fluid_force_old  = fluid_force;
+            fluid_torque_old = fluid_torque;
+            first_fluid_step = false;
+        }
         force  += (1.5*fluid_force  - 0.5*fluid_force_old);
         torque += (1.5*fluid_torque - 0.5*fluid_torque_old);
     }
