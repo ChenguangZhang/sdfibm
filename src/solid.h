@@ -15,27 +15,27 @@ class Solid
 {
 protected:
     label id;     // integer label
-    label hostid; // id of the mesh cell that host the solid center
+    label hostid {-1}; // id of the mesh cell that host the solid center
 
     // state
     vector center;
     quaternion orientation;
 
     // state's 1st time derivative
-    vector velocity;
-    vector omega;
+    vector velocity {vector::zero};
+    vector omega {vector::zero};
 
     // state's 2nd time derivative
-    vector force;
-    vector torque;
+    vector force {vector::zero};
+    vector torque {vector::zero};
 
     // fluid only force
-    vector fluid_force;
-    vector fluid_torque;
+    vector fluid_force {vector::zero};
+    vector fluid_torque {vector::zero};
 
     // fluid only force from last time step
-    vector fluid_force_old;
-    vector fluid_torque_old;
+    vector fluid_force_old {vector::zero};
+    vector fluid_torque_old {vector::zero};
 
     // property pointers
     IMotion*   ptr_motion {nullptr};
@@ -44,9 +44,9 @@ protected:
     IMaterial* ptr_material {nullptr};
 
     // object properties = shape x material
-    scalar mass;
-    scalar mass_inv;
-    tensor moi_inv;
+    scalar mass {0};
+    scalar mass_inv {0};
+    tensor moi_inv {tensor::I};
 
 public:
     // getters
@@ -72,8 +72,6 @@ public:
         // from a fixed order of Euler angles
         orientation = quaternion(quaternion::XYZ, angles);
     }
-    inline void setFluidForceOld(const vector& f)  {fluid_force_old = f; }
-    inline void setFluidTorqueOld(const vector& t) {fluid_torque_old= t; }
 
     inline IMotion*   getMotion()   const {return ptr_motion;  }
     inline IShape*    getShape()    const {return ptr_shape;   }
@@ -87,7 +85,7 @@ public:
     void setForcer(forcer::IForcer* forcer)
     {
         ptr_forcer = forcer;
-    } // TODO, akward name
+    }
     inline void setMaterial(IMaterial* material)
     {
         ptr_material = material;
@@ -134,7 +132,7 @@ public:
         fluid_force  = fluid_force_in;
         fluid_torque = fluid_torque_in;
     }
-    inline void storeOldFluidForce()
+    inline void storeOldForce()
     {
         fluid_force_old  = fluid_force;
         fluid_torque_old = fluid_torque;
@@ -188,22 +186,6 @@ public:
         center  (solid_center),
         orientation (solid_quaternion)
     {
-        velocity = vector::zero;
-        omega    = vector::zero;
-        force    = vector::zero;
-        torque   = vector::zero;
-
-        fluid_force      = vector::zero;
-        fluid_torque     = vector::zero;
-        fluid_force_old  = vector::zero;
-        fluid_torque_old = vector::zero;
-
-        ptr_motion   = nullptr;
-        ptr_shape    = nullptr;
-        ptr_material = nullptr;
-        mass = 0;
-        mass_inv = 0;
-        hostid =-1;
     }
 
     ~Solid(){}

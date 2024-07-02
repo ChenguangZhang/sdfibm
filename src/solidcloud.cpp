@@ -558,7 +558,7 @@ void SolidCloud::evolve(scalar time, scalar dt)
     // appear plane has no env force and no solid-solid interactoin TODO
 
     for (Solid& solid : m_solids)
-        solid.storeOldFluidForce();
+        solid.storeOldForce();
 }
 
 void SolidCloud::checkAlpha() const
