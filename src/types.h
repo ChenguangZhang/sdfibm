@@ -16,5 +16,7 @@ using Foam::tensor;
 using Foam::quaternion;
 using Foam::dictionary;
 
+constexpr scalar SMALL = 1e-6;
+
 }
 #endif // TYPES_H

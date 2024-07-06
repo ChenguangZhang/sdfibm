@@ -41,7 +41,7 @@ vector GeometricTools::calcApex(const Foam::labelList& vertexInds, CacheMap& phi
             break;
     }
 
-    return A - std::abs(phiA)/(1E-6 + std::fabs(phiA)+std::fabs(phiB))*(A-B);
+    return A - std::abs(phiA)/(SMALL + std::fabs(phiA)+std::fabs(phiB))*(A-B);
 }
 
 scalar GeometricTools::calcCellVolume(label cellInd, const Solid& solid, bool isTWOD = false)

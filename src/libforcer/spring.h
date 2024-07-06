@@ -39,7 +39,10 @@ IForcer::Force Spring::generate(
 )
 {
     vector r = position - pivot;
-    return {-k * r * (1.0 - l/mag(r)), vector::zero};
+    auto force {vector::zero};
+    if (mag(r) > SMALL)
+        force = -k * r * (1.0 - l/mag(r));
+    return {force, vector::zero};
 }
 
 }
