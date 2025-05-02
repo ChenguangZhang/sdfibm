@@ -5,11 +5,11 @@ An immersed boundary method (IBM) implementation for simulating fluid-solid inte
 
 # Installation
 Requirement:
-- `g++` with `C++17` 
-- OpenFOAM v9
+- `g++` with `C++17`  (tested with g++ 14.2.0)
+- OpenFOAM version 12
 - CMake (changed on 08/08/2023)
 
-Other compilers weren't tested, and they may work or not.
+Other compilers weren't tested and may work or not.
 
 *Step 1*, follow the official [guide](https://www.openfoam.org) to install OpenFOAM. **Test** by running the cavity case in both serial and parallel mode to ensure a working installation.
 
