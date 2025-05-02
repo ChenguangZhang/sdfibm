@@ -3,6 +3,7 @@
 #include "../types.h"
 #include "../genericfactory.h"
 #include "ishape.h"
+#include <functional>
 #include <cassert>
 namespace sdfibm {
     MAKESPECIALFACTORY(Shape, IShape, Foam::dictionary);

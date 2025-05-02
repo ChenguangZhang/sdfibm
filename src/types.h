@@ -18,5 +18,5 @@ using Foam::dictionary;
 
 constexpr scalar SMALL = 1e-6;
 
-}
+} // namespace sdfibm
 #endif // TYPES_H
