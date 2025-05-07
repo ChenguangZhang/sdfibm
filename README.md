@@ -19,7 +19,7 @@ git clone https://github.com/ChenguangZhang/sdfibm.git
 cd sdfibm/src
 mkdir build
 cd build
-cmake ..
+cmake ../..
 make
 ```
 That's it. The compiled solver binary is now located at `build/src/sdfibm`. It is recommended that you soft-link it to a system-wide path (e.g., `sudo ln -s <path-to-sdfibm>/build/src/sdfibm /usr/local/bin/sdfibm`), then you can run `sdfibm` in any terminal without specifying its complete path.
