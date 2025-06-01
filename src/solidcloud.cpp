@@ -306,8 +306,7 @@ void SolidCloud::writeMeanField()
         return;
     for (Solid& solid : m_solids)
     {
-        // vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler], m_Uf);
-        vector vMean = vector::zero; // XXX
+        vector vMean = calcMeanField<Foam::vector>(solid, m_libshape[m_sampler].get(), m_Uf);
         meanFieldFile << vMean.x() << ' ' << vMean.y() << ' ' << vMean.z() << ' ';
     }
     meanFieldFile << '\n';
